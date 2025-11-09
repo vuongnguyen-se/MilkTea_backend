@@ -18,5 +18,16 @@
             Topping, 
             ThucUong
         }
+        // Enum TaiKhoan
+        public enum vaiTroTK
+        {
+            KhachHang,
+            NhanVien
+        }
+        public enum trangThaiTK
+        {
+            DaKhoa,
+            KhongKhoa
+        }
     }
 }
