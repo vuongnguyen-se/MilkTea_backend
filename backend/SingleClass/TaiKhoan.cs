@@ -14,16 +14,16 @@ namespace backend.SingleClass
         [Column("tenTk")]
         public string? tenTK { get; set; }
         [Column("diaChi")]
-        public string? diaChi { get; set; }
+        public string? dc { get; set; }
         [Column("soDienThoai")]
-        public string? soDienThoai { get; set; }
+        public string? sdt { get; set; }
         [Column("tenDangNhap")]
-        public string? tenDangNhap { get; set; }
-        [Column("matKhau")]
-        public string? matKhau { get; set; }
+        public string? tenDN { get; set; }
+        [Column("matKhau")] 
+        public string? mKhau { get; set; }
         [Column("vaiTro")]
         public vaiTroTK vaiTro { get; set; }
         [Column("biKhoa")]
-        public trangThaiTK biKhoa { get; set; }
+        public bool biKhoa { get; set; }
     }
 }

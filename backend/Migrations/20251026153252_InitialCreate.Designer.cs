@@ -10,7 +10,7 @@ using backend.Models;
 
 namespace backend.Migrations
 {
-    [DbContext(typeof(MilkTeaDBContext))]
+    [DbContext(typeof(SanPhamDBContext))]
     [Migration("20251026153252_InitialCreate")]
     partial class InitialCreate
     {

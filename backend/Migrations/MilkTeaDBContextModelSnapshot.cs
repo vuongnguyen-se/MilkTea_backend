@@ -9,7 +9,7 @@ using backend.Models;
 
 namespace backend.Migrations
 {
-    [DbContext(typeof(MilkTeaDBContext))]
+    [DbContext(typeof(SanPhamDBContext))]
     partial class MilkTeaDBContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

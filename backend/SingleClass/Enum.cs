@@ -24,10 +24,5 @@
             KhachHang,
             NhanVien
         }
-        public enum trangThaiTK
-        {
-            DaKhoa,
-            KhongKhoa
-        }
     }
 }
