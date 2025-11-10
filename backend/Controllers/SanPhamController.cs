@@ -8,11 +8,11 @@ namespace backend.Controllers
 {
     [Route("SanPham/[controller]")]
     [ApiController]
-    public class MilkTeaController : ControllerBase
+    public class SanPhamController : ControllerBase
     {
-        private readonly MilkTeaDBContext _context;
+        private readonly SanPhamDBContext _context;
 
-        public MilkTeaController(MilkTeaDBContext context)
+        public SanPhamController(SanPhamDBContext context)
         {
             _context = context;
         }

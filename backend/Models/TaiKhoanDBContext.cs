@@ -1,5 +1,4 @@
-﻿using backend.Models;
-using backend.SingleClass;
+﻿using backend.SingleClass;
 using Microsoft.EntityFrameworkCore;
 using Enum = System.Enum;
 
@@ -13,6 +12,8 @@ namespace backend.Models
         }
 
         public DbSet<TaiKhoan> TaiKhoan { get; set; }
+        public DbSet<KhachHang> KhachHang { get; set; }
+        public DbSet<NhanVien> NhanVien { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

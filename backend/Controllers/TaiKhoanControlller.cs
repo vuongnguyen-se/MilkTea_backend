@@ -87,7 +87,7 @@ namespace backend.Controllers
             existingTaiKhoan.tenTK = updatedTaiKhoan.tenTK;
             existingTaiKhoan.dChi = updatedTaiKhoan.dChi;
             existingTaiKhoan.sdt = updatedTaiKhoan.sdt;
-            existingTaiKhoan.tenTK = updatedTaiKhoan.tenTK;
+            existingTaiKhoan.tenDN = updatedTaiKhoan.tenDN;
             existingTaiKhoan.mKhau = updatedTaiKhoan.mKhau;
             existingTaiKhoan.vaiTro = updatedTaiKhoan.vaiTro;
             existingTaiKhoan.biKhoa = updatedTaiKhoan.biKhoa;

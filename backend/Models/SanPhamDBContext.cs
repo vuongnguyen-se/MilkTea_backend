@@ -1,15 +1,14 @@
-﻿using backend.Models;
-using backend.SingleClass;
+﻿using backend.SingleClass;
 using Microsoft.EntityFrameworkCore;
 using Enum = System.Enum;
 
 namespace backend.Models
 {
-    public class MilkTeaDBContext : DbContext
+    public class SanPhamDBContext : DbContext
     {
-        public MilkTeaDBContext(DbContextOptions<MilkTeaDBContext> options) : base(options)
+        public SanPhamDBContext(DbContextOptions<SanPhamDBContext> options) : base(options)
         {
-
+            
         }
 
         public DbSet<SanPham> SanPham { get; set; }
