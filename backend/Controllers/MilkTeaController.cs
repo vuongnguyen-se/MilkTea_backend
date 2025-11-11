@@ -2,11 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using backend.Models;
 using backend.SingleClass;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace backend.Controllers
 {
-    [Route("SanPham/[controller]")]
+    [Route("shopAPI/[controller]")]
     [ApiController]
     public class MilkTeaController : ControllerBase
     {
@@ -18,24 +19,24 @@ namespace backend.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAllSanPham()
+        public async Task<IActionResult> GetAllSanPham()
         {
-           var allSanPham =  _context.SanPham.ToList();
+           var allSanPham = await _context.SanPham.ToListAsync();
            return Ok(allSanPham);
         }
 
         [HttpPost]
-        public IActionResult AddSanPham([FromBody]SanPham newSanPham)
+        public async Task<IActionResult> AddSanPham([FromBody]SanPham newSanPham)
         {
             try
-            {
+            {   
                 if (newSanPham == null)
                 {
                     return BadRequest("SanPham is null");
                 }
 
-                _context.SanPham.Add(newSanPham);
-                _context.SaveChanges();
+                await _context.SanPham.AddAsync(newSanPham);
+                await _context.SaveChangesAsync();
                 return Ok(new
                 {
                     message = "Adding new San Pham succeeded",
@@ -50,7 +51,7 @@ namespace backend.Controllers
         }
 
         [HttpPost("multiple")]
-        public IActionResult AddNhieuSanPham([FromBody] List<SanPham> listSanPhams)
+        public async Task<IActionResult> AddNhieuSanPham([FromBody] List<SanPham> listSanPhams)
         {
             try
             {
@@ -59,8 +60,8 @@ namespace backend.Controllers
                     return BadRequest("Danh sach san pham null hoac empty!");
                 }
 
-                _context.SanPham.AddRange(listSanPhams);
-                _context.SaveChanges();
+                await _context.SanPham.AddRangeAsync(listSanPhams);
+                await _context.SaveChangesAsync();
 
                 return Ok(new
                 {
@@ -75,22 +76,23 @@ namespace backend.Controllers
             }
         }
 
-        [HttpPut("{id}")]
-        public IActionResult UpdateSanPham(string idUpdate,[FromBody] SanPham updatedSanPham)
+        [HttpPut("{idUpdate}")]
+        public async Task<IActionResult> UpdateSanPham(string idUpdate,[FromBody] SanPham updatedSanPham)
         {
-            var existingSanPham = _context.SanPham.FirstOrDefault(eachSP => eachSP.idSP == idUpdate);
+            var existingSanPham = await _context.SanPham.FirstOrDefaultAsync(eachSP => eachSP.idSP == idUpdate);
             if (existingSanPham == null)
             {
                 return NotFound($"ID '{idUpdate}', San Pham khong ton tai!");
             }
 
-            existingSanPham.tenSP = updatedSanPham.tenSP;
-            existingSanPham.loaiSP = updatedSanPham.loaiSP;
-            existingSanPham.giaSP = updatedSanPham.giaSP;
-            existingSanPham.mota = updatedSanPham.mota;
-            existingSanPham.tinhtrang = updatedSanPham.tinhtrang;
+            //existingSanPham.tenSP = updatedSanPham.tenSP;
+            //existingSanPham.loaiSP = updatedSanPham.loaiSP;
+            //existingSanPham.giaSP = updatedSanPham.giaSP;
+            //existingSanPham.mota = updatedSanPham.mota;
+            //existingSanPham.tinhtrang = updatedSanPham.tinhtrang;
 
-            _context.SaveChanges();
+            _context.Entry(existingSanPham).CurrentValues.SetValues(updatedSanPham);
+            await _context.SaveChangesAsync();
 
             return Ok(new
             {
@@ -99,20 +101,20 @@ namespace backend.Controllers
             });
         }
 
-        [HttpDelete("{id}")]
-        public IActionResult DeleteSanPham(string idDelete)
+        [HttpDelete("{idDelete}")]
+        public async Task<IActionResult> DeleteSanPham(string idDelete)
         {
-            var existingSP = _context.SanPham.FirstOrDefault(sanpham => sanpham.idSP == idDelete);
+            var existingSP = await _context.SanPham.FirstOrDefaultAsync(sanpham => sanpham.idSP == idDelete);
             if (existingSP == null)
                 return NotFound($"ID '{idDelete}', San Pham khong ton tai!");
 
             _context.SanPham.Remove(existingSP);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return Ok(new
             {
                 message = $"ID {idDelete}, San Pham da duoc xoa!",
-                data = existingSP
+                idDelete
             });
         }
     }
