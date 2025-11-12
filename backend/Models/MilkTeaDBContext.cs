@@ -18,6 +18,9 @@ namespace backend.Models
         public DbSet<KhachHang> KhachHang { get; set; }
         public DbSet<KhuyenMai> KhuyenMai { get; set; }
         public DbSet<HoaDon> HoaDon { get; set; }
+        public DbSet<NhaCungCap> NhaCungCap { get; set; }
+        public DbSet<NguyenLieu> NguyenLieu { get; set; }
+        public DbSet<PhieuKho> PhieuKho { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // matching SanPham properties to sanpham fields.
@@ -70,6 +73,14 @@ namespace backend.Models
                 .HasConversion(
                     c => c.ToString(),
                     c => (SingleClass.Enum.phuongThucThanhToan)Enum.Parse(typeof(SingleClass.Enum.phuongThucThanhToan), c)
+                );
+
+            modelBuilder.Entity<PhieuKho>().ToTable("phieukho");
+            modelBuilder.Entity<PhieuKho>()
+                .Property(p => p.loaiPhieu)
+                .HasConversion(
+                    c => c.ToString(),
+                    c => (SingleClass.Enum.loaiPhieuKho)Enum.Parse(typeof(SingleClass.Enum.loaiPhieuKho), c)
                 );
         }
     }

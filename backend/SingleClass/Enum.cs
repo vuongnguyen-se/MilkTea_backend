@@ -39,5 +39,11 @@
             NganHang,
             ViDienTu
         }
+        // Enum loaiPhieuKho
+        public enum loaiPhieuKho
+        {
+            Nhap,
+            Xuat
+        }
     }
 }
