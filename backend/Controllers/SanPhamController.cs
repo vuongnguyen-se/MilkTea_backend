@@ -10,9 +10,9 @@ namespace backend.Controllers
     [ApiController]
     public class SanPhamController : ControllerBase
     {
-        private readonly SanPhamDBContext _context;
+        private readonly MilkTeaDBContext _context;
 
-        public SanPhamController(SanPhamDBContext context)
+        public SanPhamController(MilkTeaDBContext context)
         {
             _context = context;
         }

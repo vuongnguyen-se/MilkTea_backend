@@ -10,9 +10,9 @@ namespace backend.Controllers
     [ApiController]
     public class TaiKhoanController : ControllerBase
     {
-        private readonly TaiKhoanDBContext _context;
+        private readonly MilkTeaDBContext _context;
 
-        public TaiKhoanController(TaiKhoanDBContext context)
+        public TaiKhoanController(MilkTeaDBContext context)
         {
             _context = context;
         }

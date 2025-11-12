@@ -8,9 +8,9 @@ namespace backend.Controllers
     [ApiController]
     public class NhanVienController : ControllerBase
     {
-        private readonly TaiKhoanDBContext _context;
+        private readonly MilkTeaDBContext _context;
 
-        public NhanVienController(TaiKhoanDBContext context)
+        public NhanVienController(MilkTeaDBContext context)
         {
             _context = context;
         }

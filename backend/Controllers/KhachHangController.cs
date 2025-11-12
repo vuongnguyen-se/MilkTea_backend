@@ -10,9 +10,9 @@ namespace backend.Controllers
     [ApiController]
     public class KhachHangController : ControllerBase
     {
-        private readonly TaiKhoanDBContext _context;
+        private readonly MilkTeaDBContext _context;
 
-        public KhachHangController(TaiKhoanDBContext context)
+        public KhachHangController(MilkTeaDBContext context)
         {
             _context = context;
         }
@@ -76,7 +76,7 @@ namespace backend.Controllers
             existing.vaiTro = updated.vaiTro;
             existing.biKhoa = updated.biKhoa;
 
-            existing.DiemTichLuy = updated.DiemTichLuy;
+            existing.diemTichLuy = updated.diemTichLuy;
             existing.loaiKH = updated.loaiKH;
 
             _context.SaveChanges();

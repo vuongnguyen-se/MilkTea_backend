@@ -22,7 +22,7 @@ namespace backend.SingleClass
         [Column("matKhau")] 
         public string? mKhau { get; set; }
         [Column("vaiTro")]
-        public vaiTroTK vaiTro { get; set; }
+        public vaiTroTaiKhoan vaiTro { get; set; }
         [Column("biKhoa")]
         public bool biKhoa { get; set; }
     }

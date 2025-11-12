@@ -5,10 +5,9 @@
         // Enum DonHang
         public enum trangThaiDonHang
         {
-            ChuaXacNhan,
-            DaXacNhan,
-            DangCheBien,
-            DaGiao,
+            ChoXacNhan,
+            DangChuanBi,
+            HoanThanh,
             DaHuy
         }
 
@@ -19,10 +18,19 @@
             ThucUong
         }
         // Enum TaiKhoan
-        public enum vaiTroTK
+        public enum vaiTroTaiKhoan
         {
             KhachHang,
-            NhanVien
+            NhanVien,
+            QuanLy
+        }
+        // Enum KhachHang
+        public enum loaiKhachHang
+        {
+            Dong,
+            Bac,
+            Vang,
+            KimCuong
         }
     }
 }
