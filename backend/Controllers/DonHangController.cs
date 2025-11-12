@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.IdentityModel.Tokens;
+using Enum = backend.SingleClass.Enum;
 
 namespace backend.Controllers
 {
@@ -165,5 +166,56 @@ namespace backend.Controllers
                 throw;
             }
         }
+        // PATCH: Chuyển trạng thái tiếp theo
+        [HttpPatch("{idDH}/next")]
+        public async Task<IActionResult> NextTrangThai(string idDH)
+        {
+            var donHang = await _context.DonHang.FindAsync(idDH);
+            if (donHang == null)
+                return NotFound($"Đơn hàng {idDH} không tồn tại!");
+
+            switch (donHang.trangThai)
+            {
+                case Enum.trangThaiDonHang.ChoXacNhan:
+                    donHang.trangThai = Enum.trangThaiDonHang.DangChuanBi;
+                    break;
+                case Enum.trangThaiDonHang.DangChuanBi:
+                    donHang.trangThai = Enum.trangThaiDonHang.HoanThanh;
+                    break;
+                case Enum.trangThaiDonHang.HoanThanh:
+                case Enum.trangThaiDonHang.DaHuy:
+                    return BadRequest("Đơn hàng đã hoàn thành hoặc đã hủy, không thể chuyển trạng thái!");
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "Cập nhật trạng thái thành công!",
+                data = donHang
+            });
+        }
+
+        // PATCH: Hủy đơn hàng
+        [HttpPatch("{idDH}/huy")]
+        public async Task<IActionResult> HuyDonHang(string idDH)
+        {
+            var donHang = await _context.DonHang.FindAsync(idDH);
+            if (donHang == null)
+                return NotFound($"Đơn hàng {idDH} không tồn tại!");
+
+            if (donHang.trangThai != Enum.trangThaiDonHang.ChoXacNhan)
+                return BadRequest("Chỉ có thể hủy đơn khi trạng thái là 'Chờ xác nhận'!");
+
+            donHang.trangThai = Enum.trangThaiDonHang.DaHuy;
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "Đơn hàng đã được hủy!",
+                data = donHang
+            });
+        }
+
     }
 }

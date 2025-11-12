@@ -36,8 +36,8 @@ namespace backend.SingleClass
         [Column("trangThai")]
         public trangThaiDonHang trangThai { get; set; }
 
-        [Column("hinhThucThanhToan")]
-        public string? hinhThucThanhToan { get; set; }
+        [Column("phuongThuc")]
+        public phuongThucThanhToan phuongThuc { get; set; }
 
         [Column("tongTien")]
         public decimal tinhTong { get; set; }

@@ -32,5 +32,12 @@
             Vang,
             KimCuong
         }
+        // Enum phuongThucThanhToan
+        public enum phuongThucThanhToan
+        {
+            TienMat,
+            NganHang,
+            ViDienTu
+        }
     }
 }
