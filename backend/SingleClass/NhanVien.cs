@@ -3,7 +3,7 @@
 namespace backend.SingleClass
 {
     [Table("nhanvien")]
-    public class NhanVien
+    public class NhanVien : TaiKhoan
     {
         [Column("chucVu")]
         public string? chucVu { get; set; }

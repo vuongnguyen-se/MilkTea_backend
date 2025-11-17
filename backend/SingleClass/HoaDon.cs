@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using static backend.SingleClass.Enum;
 
 namespace backend.SingleClass
 {
@@ -7,12 +8,12 @@ namespace backend.SingleClass
     public class HoaDon
     {
         [Key]
-        [Column("maDH")]    
-        public string? maDH { get; set; }
+        [Column("maHD")]    
+        public string? maHD { get; set; }
         [Column("idDonHang")]
         public string? idDonHang { get; set; }
         [Column("phuongThuc")]
-        public string? phuongThuc { get; set; }
+        public phuongThucThanhToan phuongThuc { get; set; }
         [Column("soTien")]
         public decimal soTien { get; set; }
         [Column("ngay")]
