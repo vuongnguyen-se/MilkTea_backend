@@ -21,6 +21,9 @@ namespace backend.Models
         public DbSet<NhaCungCap> NhaCungCap { get; set; }
         public DbSet<NguyenLieu> NguyenLieu { get; set; }
         public DbSet<PhieuKho> PhieuKho { get; set; }
+        public DbSet<ChiTietDonHang> ChiTietDonHang {get; set; }
+
+        // config for mysql data type.
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // matching SanPham properties to sanpham fields.
@@ -45,6 +48,11 @@ namespace backend.Models
                     c => c.ToString(),
                     c => (SingleClass.Enum.trangThaiDonHang)Enum.Parse(typeof(SingleClass.Enum.trangThaiDonHang), c));
             //.HasColumnType("varchar(50)");
+            modelBuilder.Entity<DonHang>()
+                .Property(p => p.phuongThuc)
+                .HasConversion(
+                    c => c.ToString(),
+                    c => (SingleClass.Enum.phuongThucThanhToan)Enum.Parse(typeof(SingleClass.Enum.phuongThucThanhToan), c));
 
             // matching KhachHang properties to khachhang fields.
             modelBuilder.Entity<KhachHang>().ToTable("khachhang");
@@ -67,6 +75,7 @@ namespace backend.Models
                 .Property(p => p.biKhoa)
                 .HasColumnType("tinyint(1)");
 
+            // matching HoaDon properties to hoadon fields.
             modelBuilder.Entity<HoaDon>().ToTable("hoadon");
             modelBuilder.Entity<HoaDon>()
                 .Property(p => p.phuongThuc)
@@ -75,12 +84,22 @@ namespace backend.Models
                     c => (SingleClass.Enum.phuongThucThanhToan)Enum.Parse(typeof(SingleClass.Enum.phuongThucThanhToan), c)
                 );
 
+            // matching PhieuKho properties to phieukho fields.
             modelBuilder.Entity<PhieuKho>().ToTable("phieukho");
             modelBuilder.Entity<PhieuKho>()
                 .Property(p => p.loaiPhieu)
                 .HasConversion(
                     c => c.ToString(),
                     c => (SingleClass.Enum.loaiPhieuKho)Enum.Parse(typeof(SingleClass.Enum.loaiPhieuKho), c)
+                );
+
+            // matching ChiTietDonHang properties to chitietdonhang fields.
+            modelBuilder.Entity<ChiTietDonHang>().ToTable("chitietdonhang");
+            modelBuilder.Entity<ChiTietDonHang>()
+                .Property(p => p.size)
+                .HasConversion(
+                    c => c.ToString(),
+                    c => (SingleClass.Enum.sizeChiTietDonHang)Enum.Parse(typeof(SingleClass.Enum.sizeChiTietDonHang), c)
                 );
         }
     }

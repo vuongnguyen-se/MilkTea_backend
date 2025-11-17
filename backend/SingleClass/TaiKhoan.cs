@@ -19,6 +19,7 @@ namespace backend.SingleClass
         public string? sdt { get; set; }
         [Column("tenDangNhap")]
         public string? tenDN { get; set; }
+
         [Column("matKhau")] 
         public string? mKhau { get; set; }
         [Column("vaiTro")]

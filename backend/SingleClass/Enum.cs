@@ -45,5 +45,12 @@
             Nhap,
             Xuat
         }
+        // Enum chitietdonhang
+        public enum sizeChiTietDonHang
+        {
+            S,
+            M,
+            L
+        }
     }
 }

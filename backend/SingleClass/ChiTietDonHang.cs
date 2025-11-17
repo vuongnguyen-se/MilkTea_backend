@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace backend.SingleClass
 {
-    [Table("ChiTietDonHang")]
+    [Table("chitietdonhang")]
     public class ChiTietDonHang
     {
         [Key]
@@ -23,7 +23,7 @@ namespace backend.SingleClass
         public decimal donGia { get; set; }
 
         [Column("size")]
-        public string? size { get; set; }
+        public Enum.sizeChiTietDonHang size { get; set; }
 
         [Column("duong")]
         public int duong { get; set; }
