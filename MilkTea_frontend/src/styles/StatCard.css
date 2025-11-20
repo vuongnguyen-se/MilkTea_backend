@@ -1,0 +1,35 @@
+.statcard-container {
+  border-radius: 12px !important;
+  overflow: hidden;
+  border: 1px solid #ddd;
+}
+
+.statcard-body {
+  padding: 20px;
+}
+
+.statcard-content {
+  display: flex;
+  justify-content: space-between;
+}
+
+.statcard-title {
+  font-size: 15px;
+  color: #555;
+  margin-bottom: 8px;
+}
+
+.statcard-value {
+  font-size: 26px;
+  margin: 0;
+}
+
+.statcard-sub {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #777;
+}
+
+.statcard-icon {
+  font-size: 28px;
+}

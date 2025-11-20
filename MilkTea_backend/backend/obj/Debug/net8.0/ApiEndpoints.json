@@ -1,0 +1,877 @@
+[
+  {
+    "ContainingType": "backend.Controllers.BaoCaoController",
+    "Method": "GetBaoCaoDoanhThu",
+    "RelativePath": "shopAPI/BaoCao/DoanhThu",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "startDate",
+        "Type": "System.DateTime",
+        "IsRequired": false
+      },
+      {
+        "Name": "endDate",
+        "Type": "System.DateTime",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.BaoCaoController",
+    "Method": "GetSanPhamBanChay",
+    "RelativePath": "shopAPI/BaoCao/TopBanChay",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "soLuongBanChay",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.BaoCaoController",
+    "Method": "GetTopTonKho",
+    "RelativePath": "shopAPI/BaoCao/TopTonKho",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "topTonKho",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "loai",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.DonHangController",
+    "Method": "GetAllDonHang",
+    "RelativePath": "shopAPI/DonHang",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.DonHangController",
+    "Method": "PostDonHang",
+    "RelativePath": "shopAPI/DonHang",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "newDonHang",
+        "Type": "backend.SingleClass.DonHang",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.DonHangController",
+    "Method": "DeleteDonHang",
+    "RelativePath": "shopAPI/DonHang/{idDelete}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idDelete",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.DonHangController",
+    "Method": "HuyDonHang",
+    "RelativePath": "shopAPI/DonHang/{idDH}/huy",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idDH",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.DonHangController",
+    "Method": "NextTrangThai",
+    "RelativePath": "shopAPI/DonHang/{idDH}/next",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idDH",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.DonHangController",
+    "Method": "GetSpecificDonHang",
+    "RelativePath": "shopAPI/DonHang/{idGet}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idGet",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.DonHangController",
+    "Method": "UpdateDonHang",
+    "RelativePath": "shopAPI/DonHang/{idUpdate}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idUpdate",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "updatedDonHang",
+        "Type": "backend.SingleClass.DonHang",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.DonHangController",
+    "Method": "PostNhieuDonHang",
+    "RelativePath": "shopAPI/DonHang/multiple",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "danhSachDonHang",
+        "Type": "System.Collections.Generic.List\u00601[[backend.SingleClass.DonHang, backend, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.HoaDonController",
+    "Method": "GetAllHoaDon",
+    "RelativePath": "shopAPI/HoaDon",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.HoaDonController",
+    "Method": "GetHoaDonByDonHang",
+    "RelativePath": "shopAPI/HoaDon/{idDonHang}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idDonHang",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.HoaDonController",
+    "Method": "CreateHoaDonFromDonHang",
+    "RelativePath": "shopAPI/HoaDon/{idDonHang}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idDonHang",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.HoaDonController",
+    "Method": "UpdatePhuongThucThanhToan",
+    "RelativePath": "shopAPI/HoaDon/{maDH}/phuongthuc",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "maDH",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "phuongThucMoi",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.KhachHangController",
+    "Method": "GetAllKhachHang",
+    "RelativePath": "shopAPI/KhachHang",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.KhachHangController",
+    "Method": "AddKhachHnang",
+    "RelativePath": "shopAPI/KhachHang",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "kh",
+        "Type": "backend.SingleClass.KhachHang",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.KhachHangController",
+    "Method": "GetKhachHangById",
+    "RelativePath": "shopAPI/KhachHang/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.KhachHangController",
+    "Method": "UpdateKhachHang",
+    "RelativePath": "shopAPI/KhachHang/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "updated",
+        "Type": "backend.SingleClass.KhachHang",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.KhachHangController",
+    "Method": "Delete",
+    "RelativePath": "shopAPI/KhachHang/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.KhachHangController",
+    "Method": "AddNhieuKhachHang",
+    "RelativePath": "shopAPI/KhachHang/multiple",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "listKhachHangs",
+        "Type": "System.Collections.Generic.List\u00601[[backend.SingleClass.KhachHang, backend, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.KhachHangController",
+    "Method": "ToggleLockKhachHang",
+    "RelativePath": "shopAPI/KhachHang/toggle-lock/{id}",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.KhoNLController",
+    "Method": "GetAllNguyenLieu",
+    "RelativePath": "shopAPI/KhoNL",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.KhoNLController",
+    "Method": "GetNguyenLieuById",
+    "RelativePath": "shopAPI/KhoNL/{idNL}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idNL",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.KhoNLController",
+    "Method": "NhapKho",
+    "RelativePath": "shopAPI/KhoNL/{idNL}/nhap",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idNL",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "soLuong",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.KhoNLController",
+    "Method": "XuatKho",
+    "RelativePath": "shopAPI/KhoNL/{idNL}/xuat",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idNL",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "soLuong",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.NhaCungCapController",
+    "Method": "GetAll",
+    "RelativePath": "shopAPI/NhaCungCap",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.NhaCungCapController",
+    "Method": "Create",
+    "RelativePath": "shopAPI/NhaCungCap",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "backend.SingleClass.NhaCungCap",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.NhaCungCapController",
+    "Method": "GetById",
+    "RelativePath": "shopAPI/NhaCungCap/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.NhaCungCapController",
+    "Method": "Update",
+    "RelativePath": "shopAPI/NhaCungCap/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "update",
+        "Type": "backend.SingleClass.NhaCungCap",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.NhaCungCapController",
+    "Method": "Delete",
+    "RelativePath": "shopAPI/NhaCungCap/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.NhanVienController",
+    "Method": "GetAllNhanVien",
+    "RelativePath": "shopAPI/NhanVien",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.NhanVienController",
+    "Method": "AddNhanVien",
+    "RelativePath": "shopAPI/NhanVien",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "nv",
+        "Type": "backend.SingleClass.NhanVien",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.NhanVienController",
+    "Method": "GetNhanVienById",
+    "RelativePath": "shopAPI/NhanVien/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.NhanVienController",
+    "Method": "UpdateNhanVien",
+    "RelativePath": "shopAPI/NhanVien/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "updated",
+        "Type": "backend.SingleClass.NhanVien",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.NhanVienController",
+    "Method": "DeleteNhanVien",
+    "RelativePath": "shopAPI/NhanVien/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.NhanVienController",
+    "Method": "AddNhieuNhanVien",
+    "RelativePath": "shopAPI/NhanVien/multiple",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "listNhanViens",
+        "Type": "System.Collections.Generic.List\u00601[[backend.SingleClass.NhanVien, backend, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.NhanVienController",
+    "Method": "ToggleLockNhanVien",
+    "RelativePath": "shopAPI/NhanVien/toggle-lock/{id}",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.PhieuKhoController",
+    "Method": "GetAllPhieu",
+    "RelativePath": "shopAPI/PhieuKho",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.PhieuKhoController",
+    "Method": "TaoPhieu",
+    "RelativePath": "shopAPI/PhieuKho",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "backend.SingleClass.PhieuKho",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.PhieuKhoController",
+    "Method": "GetPhieuKhoById",
+    "RelativePath": "shopAPI/PhieuKho/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.SanPhamController",
+    "Method": "GetAllSanPham",
+    "RelativePath": "shopAPI/SanPham",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.SanPhamController",
+    "Method": "AddSanPham",
+    "RelativePath": "shopAPI/SanPham",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "newSanPham",
+        "Type": "backend.SingleClass.SanPham",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.SanPhamController",
+    "Method": "GetSanPhamById",
+    "RelativePath": "shopAPI/SanPham/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.SanPhamController",
+    "Method": "UpdateSanPham",
+    "RelativePath": "shopAPI/SanPham/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idUpdate",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "updatedSanPham",
+        "Type": "backend.SingleClass.SanPham",
+        "IsRequired": true
+      },
+      {
+        "Name": "id",
+        "Type": "",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.SanPhamController",
+    "Method": "DeleteSanPham",
+    "RelativePath": "shopAPI/SanPham/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idDelete",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "id",
+        "Type": "",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.SanPhamController",
+    "Method": "AddNhieuSanPham",
+    "RelativePath": "shopAPI/SanPham/multiple",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "listSanPhams",
+        "Type": "System.Collections.Generic.List\u00601[[backend.SingleClass.SanPham, backend, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.TaiKhoanController",
+    "Method": "GetAllTaiKhoan",
+    "RelativePath": "shopAPI/TaiKhoan",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.TaiKhoanController",
+    "Method": "AddTaiKhoan",
+    "RelativePath": "shopAPI/TaiKhoan",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "newTaiKhoan",
+        "Type": "backend.SingleClass.TaiKhoan",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.TaiKhoanController",
+    "Method": "GetTaiKhoanById",
+    "RelativePath": "shopAPI/TaiKhoan/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.TaiKhoanController",
+    "Method": "UpdateTaiKhoan",
+    "RelativePath": "shopAPI/TaiKhoan/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "updatedTaiKhoan",
+        "Type": "backend.SingleClass.TaiKhoan",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.TaiKhoanController",
+    "Method": "DeleteTaiKhoan",
+    "RelativePath": "shopAPI/TaiKhoan/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.TaiKhoanController",
+    "Method": "AddNhieuTaiKhoan",
+    "RelativePath": "shopAPI/TaiKhoan/multiple",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "listTaiKhoans",
+        "Type": "System.Collections.Generic.List\u00601[[backend.SingleClass.TaiKhoan, backend, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.TaiKhoanController",
+    "Method": "ToggleLockAccount",
+    "RelativePath": "shopAPI/TaiKhoan/toggle-lock/{id}",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]

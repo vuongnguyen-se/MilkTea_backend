@@ -1,0 +1,63 @@
+.dashboard{
+  background-color: #f3f4f6;
+}
+.dashboard-body {
+  width: 100%;
+  max-width: 1250px;
+  margin: auto;
+  padding: 24px;
+  padding-bottom: 40px;
+}
+
+.stats-row .ant-card {
+  padding: 18px 20px !important;
+  border-radius: 14px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.stats-row p {
+  font-size: 15px;
+}
+
+.stats-row h2 {
+  font-size: 26px;
+  margin-top: 6px;
+  font-weight: 700;
+}
+
+.stats-row small {
+  font-size: 13px;
+  color: #888;
+}
+/* CARD CHUNG */
+.stat-card {
+  position: relative;
+  border-radius: 18px !important;
+  overflow: hidden;
+  padding: 22px !important;
+  background: #fff;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+  transition: 0.25s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+/* VIỀN TRÁI PREMIUM */
+.stat-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 7px;
+  /* Độ dày đẹp hơn */
+  height: 100%;
+  border-radius: 18px 0 0 18px;
+  background: linear-gradient(180deg,
+      var(--left-color) 0%,
+      color-mix(in srgb, var(--left-color), #ffffff 30%) 100%);
+  /* Gradient nhẹ giúp thẻ sang hơn */
+}

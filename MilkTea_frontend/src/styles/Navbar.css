@@ -1,0 +1,35 @@
+.navbar {
+  padding: 30px 50px ;
+  display: flex;
+  justify-content: space-between;
+  justify-items: flex-start;
+  border-bottom: 2px solid #cccbcb;
+}
+
+.navbar-left {
+  gap: 32px;
+  flex: 1;
+}
+
+.navbar-title {
+  margin: 0 0 20px 0;
+  font-size: 28px;
+}
+ul li{
+  border: 1px solid #cccbcb;
+  margin-right: 10px !important;
+  border-radius: 9px !important;
+  font-size: 14px ;
+  font-weight: 600;
+}
+ul li:hover{
+  background-color: #dddddd6b !important;
+  
+}
+ul li span svg {
+  font-size: 16px;
+}
+
+.navbar-func .ant-menu-item::after {
+  display: none !important;
+}

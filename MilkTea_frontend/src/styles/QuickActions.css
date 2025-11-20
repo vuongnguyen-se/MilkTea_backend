@@ -1,0 +1,32 @@
+.quick-wrapper {
+  display: flex;
+  gap: 16px;
+}
+
+.quick-card {
+  flex: 1;
+  border-radius: 12px !important;
+  text-align: center;
+  border: 2px solid #e5e7eb !important;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+/* 🌟 Hover dùng biến --hover-color */
+.quick-card:hover {
+  border-color: var(--hover-color) !important;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.quick-icon {
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+.quick-label {
+  font-size: 20px;
+}
+.ant-card-body{
+  padding: 15px !important;
+}
