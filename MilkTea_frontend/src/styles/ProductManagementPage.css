@@ -1,0 +1,103 @@
+.pm-layout {
+  height: 100vh;
+  background: #f5f5f5;
+}
+
+.pm-content {
+  padding: 12px 16px;
+}
+
+/* ===== TOP BAR ===== */
+.pm-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 12px 18px;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.pm-shop-name {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.pm-nav-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.pm-nav-tabs .ant-btn {
+  border-radius: 20px;
+}
+
+.pm-nav-active {
+  background: #ddd;
+  border-color: #111;
+}
+
+/* bên phải */
+.pm-topbar-right {
+  display: flex;
+  gap: 10px;
+}
+
+/* ===== MAIN CARD ===== */
+.pm-main-card {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 16px 20px 12px;
+  min-height: calc(100vh - 110px);
+  display: flex;
+  flex-direction: column;
+}
+
+.pm-main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.pm-main-header h2 {
+  margin: 0;
+}
+
+/* filters */
+.pm-func{
+  display: flex;
+  justify-content: space-between;
+}
+.pm-filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.pm-filters .ant-input-search {
+  flex: 1;
+}
+
+/* table */
+.pm-table .ant-table-thead>tr>th {
+  background: #fafafa;
+}
+
+.pm-table .ant-table {
+  border-radius: 8px;
+}
+
+/* modal */
+.pm-modal-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 12px;
+}
+.pm-modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}

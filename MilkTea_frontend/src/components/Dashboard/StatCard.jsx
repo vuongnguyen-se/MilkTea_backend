@@ -1,4 +1,5 @@
 import { Card } from "antd";
+import "../../styles/StatCard.css";
 
 export default function StatCard({ title, value, sub, color, icon, style }) {
   return (

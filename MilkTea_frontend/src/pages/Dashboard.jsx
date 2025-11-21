@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import StatCard from "../components/StatCard";
-import RecentActivities from "../components/RecentActivities";
-import QuickActions from "../components/QuickActions";
-import Navbar from "../components/Navbar";
+import StatCard from "../components/Dashboard/StatCard";
+import RecentActivities from "../components/Dashboard/RecentActivities";
+import QuickActions from "../components/Dashboard/QuickActions";
+import Navbar from "../components/Dashboard/Navbar";
 import "../styles/Dashboard.css"
 import {
   DollarOutlined,

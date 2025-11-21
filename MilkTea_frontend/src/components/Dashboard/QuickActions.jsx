@@ -1,6 +1,6 @@
 import { Card } from "antd";
 import { ShoppingCartOutlined, InboxOutlined, UserAddOutlined, LineChartOutlined } from "@ant-design/icons";
-import "./../styles/QuickActions.css";
+import "../../styles/QuickActions.css";
 
 export default function QuickActions() {
   const items = [

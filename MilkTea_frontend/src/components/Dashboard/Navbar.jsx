@@ -1,5 +1,5 @@
 import { Button, Menu } from "antd";
-import "./../styles/Navbar.css"; // thêm css
+import "../../styles/Navbar.css"; // thêm css
 import {
   LogoutOutlined,
   AppstoreOutlined,
