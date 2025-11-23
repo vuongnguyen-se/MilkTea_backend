@@ -6,7 +6,7 @@ namespace backend.QuanLy
     {
         public string? idNL { get; set; }
         public string? nameNL { get; set; }
-        public int TongTonKho { get; set; }
+        public float TongTonKho { get; set; }
 
     }
     public enum LoaiTonKho

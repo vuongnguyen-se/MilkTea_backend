@@ -12,7 +12,7 @@ namespace backend.SingleClass
         [Column("tenNL")]
         public string? tenNL { get; set; }
         [Column("soLuongTon")]
-        public int soLuongTon { get; set; }
+        public float soLuongTon { get; set; }
         [Column("donVi")]
         public string? donVi { get; set; }
         [Column("hanSuDung")]

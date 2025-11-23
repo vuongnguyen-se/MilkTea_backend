@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import StatCard from "../components/Dashboard/StatCard";
 import RecentActivities from "../components/Dashboard/RecentActivities";
-import QuickActions from "../components/Dashboard/QuickActions";
 import Navbar from "../components/Dashboard/Navbar";
 import "../styles/Dashboard.css"
 import {
@@ -80,9 +79,14 @@ export default function Dashboard() {
 
             <StatCard
               title="Cảnh báo tồn kho"
-              value={data.lowStock}
-              sub="Số nguyên liệu dưới mức an toàn"
-              color="#EF4444"          // đỏ cảnh báo
+              value={
+                <div style={{ fontSize: 16, lineHeight: "18px" }}>
+                  <div style={{ marginBottom: 5, marginTop: 5 }}>Sắp hết: <strong>{data.lowStockUnder10}</strong> nguyên liệu</div>
+                  <div>Tồn kho: <strong>{data.highStockOver50}</strong> nguyên liệu</div>
+                </div>
+              }
+              sub="Theo báo cáo kho"
+              color="#EF4444"          // màu cảnh báo (đỏ)
               icon={<ExclamationCircleOutlined />}
               style={{ "--left-color": "#EF4444" }}
             />
@@ -98,10 +102,12 @@ export default function Dashboard() {
           </div>
 
           {/* Recent Activities */}
-          <RecentActivities data={data.recentActivities} />
+          <div className="da-bd">
+            <RecentActivities data={data.recentActivities} />
 
-          {/* Quick Actions */}
-          <QuickActions />
+          </div>
+
+
         </div>s
       </div>
     </div >

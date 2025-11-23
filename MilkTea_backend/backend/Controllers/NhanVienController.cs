@@ -74,12 +74,15 @@ namespace backend.Controllers
 
             existing.chucVu = updated.chucVu;
             existing.caLam = updated.caLam;
-            existing.luong = updated.luong;
+            existing.soCa = updated.soCa;
+            existing.phuCap = updated.phuCap;
+            existing.tongLuong = updated.tongLuong;
 
             _context.SaveChanges();
 
             return Ok(new { message = "Cập nhật nhân viên thành công!", data = existing });
         }
+
 
         [HttpDelete("{id}")]
         public IActionResult DeleteNhanVien(string id)

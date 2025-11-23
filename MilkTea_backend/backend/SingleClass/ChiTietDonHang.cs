@@ -30,5 +30,10 @@ namespace backend.SingleClass
 
         [Column("da")]
         public int da { get; set; }
+        [ForeignKey("idSP")]
+        public SanPham SanPham { get; set; }
+        [ForeignKey("idDH")]
+        public DonHang DonHang { get; set; }
+
     }
 }

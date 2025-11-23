@@ -54,14 +54,17 @@ namespace backend.Controllers
       int sanPhamDangBan = sanPham.Count(x => x.tinhtrang == true);
       int sanPhamNgungBan = sanPham.Count(x => x.tinhtrang == false);
 
-      int canhBaoTonKho = nguyenLieu.Where(n => n.soLuongTon < 5).Count();
+      // ================================
+      // ⚠️ CẢNH BÁO TỒN KHO BỔ SUNG
+      // ================================
+      int soNguyenLieuSapHet = nguyenLieu.Count(n => n.soLuongTon < 10);
+      int soNguyenLieuTonNhieu = nguyenLieu.Count(n => n.soLuongTon > 50);
 
       // ================================
-      // 3️⃣ Recent Activities (combine)
+      // 3️⃣ Recent Activities
       // ================================
       var listRecent = new List<object>();
 
-      // Đơn hàng gần đây
       listRecent.AddRange(
           donHang
           .OrderByDescending(x => x.ngayDat)
@@ -76,7 +79,6 @@ namespace backend.Controllers
           })
       );
 
-      // Phiếu kho (Nhập / Xuất)
       listRecent.AddRange(
           phieuKho
           .OrderByDescending(x => x.ngay)
@@ -111,7 +113,9 @@ namespace backend.Controllers
         sellingProducts = sanPhamDangBan,
         stoppedProducts = sanPhamNgungBan,
 
-        lowStock = canhBaoTonKho,
+        // 🔥 gửi thêm 2 cảnh báo kho
+        lowStockUnder10 = soNguyenLieuSapHet,   // < 10
+        highStockOver50 = soNguyenLieuTonNhieu, // > 50
 
         recentActivities = recentActivities
       });

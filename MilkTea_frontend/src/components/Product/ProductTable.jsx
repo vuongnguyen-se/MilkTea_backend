@@ -1,10 +1,11 @@
+// src/components/Product/ProductTable.jsx
 import React from "react";
 import { Table, Tag, Switch, Button, Space, Popconfirm } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { formatCurrency } from "../utils/formatCurrency.jsx";
 import "../../styles/ProductManagementPage.css";
 
-const ProductTable = ({ products, onEdit, onDelete, onToggleActive }) => {
+const ProductTable = ({ products, onEdit, onDelete, onToggleActive, loading }) => {
   const columns = [
     {
       title: "Mã SP",
@@ -21,7 +22,9 @@ const ProductTable = ({ products, onEdit, onDelete, onToggleActive }) => {
       dataIndex: "category",
       width: 140,
       render: (v) => (
-        <Tag color="black">{v === "drink" ? "Thức uống" : "Topping"}</Tag>
+        <Tag color="black">
+          {v === "ThucUong" ? "Thức uống" : "Topping"}
+        </Tag>
       ),
     },
     {
@@ -35,13 +38,15 @@ const ProductTable = ({ products, onEdit, onDelete, onToggleActive }) => {
       dataIndex: "isActive",
       width: 140,
       render: (value, record) => (
-        <Space>
-          <Switch
-            checked={value}
-            onChange={(checked) => onToggleActive(record.id, checked)}
-          />
-          {value ? "Bán" : "Ngưng"}
-        </Space>
+        <Switch
+          checked={record.isActive}
+          onChange={(checked) => onToggleActive(record.id, checked)}
+          checkedChildren="Bán"
+          unCheckedChildren="Ngưng"
+          style={{
+            backgroundColor: record.isActive ? "#52c41a" : "#ff4d4f",
+          }}
+        />
       ),
     },
     {
@@ -74,6 +79,7 @@ const ProductTable = ({ products, onEdit, onDelete, onToggleActive }) => {
       rowKey="id"
       pagination={false}
       className="pm-table"
+      loading={loading}
       scroll={{ y: "calc(100vh - 320px)" }}
     />
   );

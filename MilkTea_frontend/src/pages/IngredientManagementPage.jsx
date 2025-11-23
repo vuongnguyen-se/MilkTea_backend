@@ -1,186 +1,156 @@
-import React, { useMemo, useState } from "react";
-import { Layout, Button, Input, Form } from "antd";
+// src/pages/IngredientManagementPage.jsx
+import React, { useEffect, useState, useMemo } from "react";
+import { Layout, Input, Select, Button, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import dayjs from "dayjs";
 
-import Topbar from "../components/Topbar/Topbar.jsx";
-import IngredientModal from "../components/Ingredient/IngredientModal.jsx";
 import IngredientTablee from "../components/Ingredient/IngredientTablee.jsx";
-
-import "../styles/ProductManagementPage.css"; // dùng chung style
+import IngredientImportModal from "../components/Ingredient/IngredientImportModal.jsx";
 
 const { Content } = Layout;
 const { Search } = Input;
 
-// fake data ban đầu
-const initialIngredients = [
-  {
-    id: 1,
-    code: "TS001",
-    name: "Trân Châu Đen",
-    expiryDate: "18/02/2024",
-    quantity: 150,
-    isActive: true,
-    imageUrl: "",
-  },
-  {
-    id: 2,
-    code: "TS002",
-    name: "Bột Kem Béo",
-    expiryDate: "18/02/2024",
-    quantity: 3, // sẽ hiện tag "Sắp hết"
-    isActive: true,
-    imageUrl: "",
-  },
-  {
-    id: 3,
-    code: "TS003",
-    name: "Bột Matcha Cao Cấp",
-    expiryDate: "18/02/2024",
-    quantity: 0, // sẽ hiện "Hết hàng" và tắt switch
-    isActive: false,
-    imageUrl: "",
-  },
-];
+const API_KHO = "http://localhost:5159/shopAPI/KhoNL";
+const API_NCC = "http://localhost:5159/shopAPI/NhaCungCap";
+const API_CCNL = "http://localhost:5159/shopAPI/CungCapNguyenLieu";
+const API_NHAP = "http://localhost:5159/shopAPI/PhieuKho/Nhap";
 
-const IngredientManagementPage = () => {
-  const [ingredients, setIngredients] = useState(initialIngredients);
+export default function IngredientManagementPage() {
+  const [ingredients, setIngredients] = useState([]);
+  const [suppliers, setSuppliers] = useState([]);
+  const [unitFilter, setUnitFilter] = useState("all");
   const [searchText, setSearchText] = useState("");
-  const [modalVisible, setModalVisible] = useState(false);
-  const [editingIngredient, setEditingIngredient] = useState(null);
-  const [form] = Form.useForm();
+  const [importModalVisible, setImportModalVisible] = useState(false);
 
-  const filteredIngredients = useMemo(() => {
-    return ingredients.filter((ing) => {
-      const keyword = searchText.toLowerCase();
-      return (
-        ing.name.toLowerCase().includes(keyword) ||
-        ing.code.toLowerCase().includes(keyword)
+  // Load kho nguyên liệu
+  const fetchIngredients = async () => {
+    try {
+      const res = await fetch(API_KHO);
+      const json = await res.json();
+
+      setIngredients(
+        json.data.map((i) => ({
+          idNL: i.idNL,
+          tenNL: i.tenNL,
+          donVi: i.donVi,
+          soLuongTon: Number(i.soLuongTon),
+        }))
       );
+    } catch (err) {
+      console.error(err);
+      message.error("Không thể tải kho nguyên liệu");
+    }
+  };
+
+  // Load NCC
+  const fetchSuppliers = async () => {
+    try {
+      const res = await fetch(API_NCC);
+      const json = await res.json();
+
+      setSuppliers(
+        json.data.map((x) => ({
+          id: x.idNCC,
+          name: x.tenNCC,
+        }))
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Load ban đầu
+  useEffect(() => {
+    fetchIngredients();
+    fetchSuppliers();
+  }, []);
+
+  // Filter + Search
+  const filteredIngredients = useMemo(() => {
+    return ingredients.filter((item) => {
+      const keyword = searchText.toLowerCase();
+      const matchSearch =
+        item.tenNL.toLowerCase().includes(keyword) ||
+        item.idNL.toLowerCase().includes(keyword);
+
+      const matchUnit =
+        unitFilter === "all" || item.donVi.toLowerCase() === unitFilter;
+
+      return matchSearch && matchUnit;
     });
-  }, [ingredients, searchText]);
+  }, [ingredients, searchText, unitFilter]);
 
-  const openAddModal = () => {
-    form.resetFields();
-    form.setFieldsValue({
-      code: Date.now().toString(),
-      name: "",
-      expiryDate: null,
-      quantity: 0,
-      imageUrl: "",
-      isActive: true,
-    });
-    setEditingIngredient(null);
-    setModalVisible(true);
+  // Fetch NL của NCC
+  const fetchSupplierIngredients = async (idNCC) => {
+    const res = await fetch(`${API_CCNL}/${idNCC}`);
+    const json = await res.json();
+    return json.data;
   };
 
-  const openEditModal = (record) => {
-    setEditingIngredient(record);
-    form.setFieldsValue({
-      ...record,
-      expiryDate: record.expiryDate
-        ? dayjs(record.expiryDate, "DD/MM/YYYY")
-        : null,
-    });
-    setModalVisible(true);
-  };
+  // Submit nhập kho
+  const onSubmitImport = async (payload) => {
+    try {
+      const res = await fetch(API_NHAP, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-  const closeModal = () => {
-    setModalVisible(false);
-    setEditingIngredient(null);
-    form.resetFields();
-  };
-
-  const submitModal = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        const payload = {
-          ...values,
-          expiryDate: values.expiryDate
-            ? values.expiryDate.format("DD/MM/YYYY")
-            : "",
-        };
-
-        if (editingIngredient) {
-          setIngredients((prev) =>
-            prev.map((ing) =>
-              ing.id === editingIngredient.id ? { ...ing, ...payload } : ing
-            )
-          );
-        } else {
-          setIngredients((prev) => [
-            ...prev,
-            { id: Date.now(), ...payload },
-          ]);
-        }
-
-        closeModal();
-      })
-      .catch(() => { });
-  };
-
-  const deleteIngredient = (id) => {
-    setIngredients((prev) => prev.filter((ing) => ing.id !== id));
-  };
-
-  const toggleActive = (id, value) => {
-    setIngredients((prev) =>
-      prev.map((ing) =>
-        ing.id === id
-          ? { ...ing, isActive: value && ing.quantity > 0 }
-          : ing
-      )
-    );
+      if (!res.ok) throw new Error();
+      message.success("Nhập kho thành công");
+      fetchIngredients();
+    } catch (err) {
+      console.error(err);
+      message.error("Không thể nhập kho");
+    }
   };
 
   return (
-    <Layout className="pm-layout">
-      <Content className="pm-content">
-        {/* Topbar dùng chung */}
-        <Topbar activeTab="ingredient" />
+    <Layout>
+      <Content style={{ padding: 20 }}>
+        <h2>Quản lý kho nguyên liệu</h2>
 
-        <div className="pm-main-card">
-          <div className="pm-main-header">
-            <h2>Quản lý kho nguyên liệu</h2>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={openAddModal}
-            >
-              Thêm nguyên liệu
-            </Button>
-          </div>
-
-          {/* Tìm kiếm */}
-          <div className="pm-filters">
-            <Search
-              placeholder="Tìm kiếm nguyên liệu..."
-              allowClear
-              onChange={(e) => setSearchText(e.target.value)}
-            />
-          </div>
-
-          {/* Bảng nguyên liệu */}
-          <IngredientTablee
-            ingredients={filteredIngredients}
-            onEdit={openEditModal}
-            onDelete={deleteIngredient}
-            onToggleActive={toggleActive}
+        {/* Search + Filter */}
+        <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
+          <Search
+            placeholder="Tìm nguyên liệu..."
+            onChange={(e) => setSearchText(e.target.value)}
+            style={{ width: 260 }}
+            allowClear
           />
+
+          <Select
+            value={unitFilter}
+            onChange={setUnitFilter}
+            style={{ width: 150 }}
+          >
+            <Select.Option value="all">Tất cả đơn vị</Select.Option>
+            <Select.Option value="kg">kg</Select.Option>
+            <Select.Option value="lit">lit</Select.Option>
+            <Select.Option value="hop">hộp</Select.Option>
+          </Select>
+
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => setImportModalVisible(true)}
+            style={{ marginLeft: "auto" }}
+          >
+            Nhập kho từ NCC
+          </Button>
         </div>
 
-        {/* Modal thêm / sửa nguyên liệu */}
-        <IngredientModal
-          visible={modalVisible}
-          form={form}
-          editingIngredient={editingIngredient}
-          onCancel={closeModal}
-          onSubmit={submitModal}
+        {/* Bảng nguyên liệu */}
+        <IngredientTablee ingredients={filteredIngredients} />
+
+        {/* Modal nhập kho */}
+        <IngredientImportModal
+          visible={importModalVisible}
+          onClose={() => setImportModalVisible(false)}
+          suppliers={suppliers}
+          fetchSupplierIngredients={fetchSupplierIngredients}
+          onSubmitImport={onSubmitImport}
         />
       </Content>
     </Layout>
   );
-};
-
-export default IngredientManagementPage;
+}

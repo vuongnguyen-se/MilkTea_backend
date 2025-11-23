@@ -21,7 +21,10 @@ namespace backend.Models
         public DbSet<NhaCungCap> NhaCungCap { get; set; }
         public DbSet<NguyenLieu> NguyenLieu { get; set; }
         public DbSet<PhieuKho> PhieuKho { get; set; }
-        public DbSet<ChiTietDonHang> ChiTietDonHang {get; set; }
+        public DbSet<ChiTietDonHang> ChiTietDonHang { get; set; }
+        public DbSet<CungCapNguyenLieu> CungCapNguyenLieu { get; set; }
+        public DbSet<DinhLuongCongThuc> DinhLuongCongThuc { get; set; }
+
 
         // config for mysql data type.
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -101,6 +104,9 @@ namespace backend.Models
                     c => c.ToString(),
                     c => (SingleClass.Enum.sizeChiTietDonHang)Enum.Parse(typeof(SingleClass.Enum.sizeChiTietDonHang), c)
                 );
+            modelBuilder.Entity<CungCapNguyenLieu>().HasNoKey();
+            modelBuilder.Entity<DinhLuongCongThuc>().ToTable("dinhluongcongthuc");
+            modelBuilder.Entity<DinhLuongCongThuc>().HasNoKey();
         }
     }
 }

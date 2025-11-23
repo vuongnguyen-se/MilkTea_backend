@@ -1,75 +1,108 @@
-import React, { useMemo, useState } from "react";
+/* eslint-disable */
+import React, { useEffect, useMemo, useState } from "react";
 import { Layout, Button, Input, Form, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 
-import Topbar from "../components/Topbar/Topbar.jsx";
 import StaffTable from "../components/Staff/StaffTable.jsx";
 import StaffSalaryModal from "../components/Staff/StaffSalaryModal.jsx";
 import StaffEditModal from "../components/Staff/StaffEditModal.jsx";
 
-import "../styles/ProductManagementPage.css"; // dùng lại layout
+import "../styles/ProductManagementPage.css";
 
 const { Content } = Layout;
 const { Search } = Input;
 
-// fake data mẫu
-const initialStaff = [
-  {
-    id: 1,
-    code: "NV001",
-    fullName: "Nguyễn Văn A",
-    role: "Quản lý",
-    phone: "0901234567",
-    shift: "Cả ngày",
-    isWorking: true,
-    baseSalary: 15000000,
-    allowance: 2000000,
-    username: "nguyenvana",
-    address: "123 Nguyễn Huệ, Q1",
-  },
-  {
-    id: 2,
-    code: "NV002",
-    fullName: "Trần Thị B",
-    role: "Thu ngân",
-    phone: "0902345678",
-    shift: "Ca sáng",
-    isWorking: true,
-    baseSalary: 8000000,
-    allowance: 1000000,
-    username: "tranthib",
-    address: "",
-  },
-  {
-    id: 3,
-    code: "NV003",
-    fullName: "Lê Văn C",
-    role: "Pha chế",
-    phone: "0903456789",
-    shift: "Ca tối",
-    isWorking: true,
-    baseSalary: 9000000,
-    allowance: 500000,
-    username: "levanc",
-    address: "",
-  },
-  {
-    id: 4,
-    code: "NV004",
-    fullName: "Phạm Thị D",
-    role: "Phục vụ",
-    phone: "0904567890",
-    shift: "Ca sáng",
-    isWorking: false,
-    baseSalary: 7000000,
-    allowance: 0,
-    username: "phamthid",
-    address: "",
-  },
-];
+const API_BASE = "http://localhost:5159/shopAPI/NhanVien";
+const PER_SHIFT_SALARY = 180000; // 1 ca = 180k
+
+// ====== Helpers ======
+
+// Tính tổng lương dựa trên số ca + phụ cấp + ca làm chính
+const calcTotalSalary = (shiftsCount, allowance, shift) => {
+  const rawShifts = Number(shiftsCount || 0);
+  const phuCap = Number(allowance || 0);
+
+  // Nếu ca chính là "Cả ngày" → mỗi ca trong input tương đương 3 ca thực tế
+  const normalizedShifts =
+    shift === "Cả ngày" ? rawShifts * 3 : rawShifts;
+
+  return normalizedShifts * PER_SHIFT_SALARY + phuCap;
+};
+
+// Map API -> object FE dùng
+const mapFromApi = (nv) => {
+  const soCa = nv.soCa ?? 0;
+  const allowance = Number(nv.phuCap || 0);
+
+  const total =
+    nv.tongLuong != null
+      ? Number(nv.tongLuong)
+      : calcTotalSalary(soCa, allowance, nv.caLam || "");
+
+  return {
+    id: nv.idTK,
+    code: nv.idTK,
+    fullName: nv.tenTK || "",
+    role: nv.chucVu || "",
+    phone: nv.sdt || nv.soDienThoai || "",
+    shift: nv.caLam || "",
+    shiftsCount: soCa,
+    allowance,
+    totalSalary: total,
+    username: nv.tenDN || nv.tenDangNhap || "",
+    password: nv.mKhau || nv.matKhau || "",
+    address: nv.dChi || nv.diaChi || "",
+    isWorking: !nv.biKhoa,
+  };
+};
+
+// Map FE -> payload gửi API
+const buildPayload = (staff) => {
+  const total = calcTotalSalary(
+    staff.shiftsCount,
+    staff.allowance,
+    staff.shift
+  );
+
+  // Lưu soCa ở DB là số ca đã chuẩn hoá (đã nhân 3 nếu "Cả ngày")
+  const rawShifts = Number(staff.shiftsCount || 0);
+  const normalizedShifts =
+    staff.shift === "Cả ngày" ? rawShifts * 3 : rawShifts;
+
+  return {
+    idTK: staff.code,
+    tenTK: staff.fullName,
+    dChi: staff.address || "",
+    sdt: staff.phone || "",
+    tenDN: staff.username,
+    mKhau: staff.password,
+    vaiTro: 1, // 0: KH, 1: NV, 2: QL
+    biKhoa: !staff.isWorking,
+
+    chucVu: staff.role,
+    caLam: staff.shift,
+    soCa: normalizedShifts,
+    phuCap: staff.allowance || 0,
+    tongLuong: total,
+  };
+};
+
+// Sinh mã NV: NV001, NV002, ...
+const getNextStaffCode = (list) => {
+  let maxNum = 0;
+  list.forEach((s) => {
+    const code = s.code || "";
+    if (code.startsWith("NV")) {
+      const num = parseInt(code.slice(2), 10);
+      if (!isNaN(num) && num > maxNum) maxNum = num;
+    }
+  });
+  const next = maxNum + 1;
+  return `NV${String(next).padStart(3, "0")}`;
+};
 
 const StaffManagementPage = () => {
-  const [staffList, setStaffList] = useState(initialStaff);
+  const [staffList, setStaffList] = useState([]);
   const [searchText, setSearchText] = useState("");
 
   const [salaryModalVisible, setSalaryModalVisible] = useState(false);
@@ -81,69 +114,121 @@ const StaffManagementPage = () => {
   const [editForm] = Form.useForm();
   const [editingStaff, setEditingStaff] = useState(null);
 
+  const [loading, setLoading] = useState(false);
+
+  // ====== API: load list NV ======
+  const loadStaff = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(API_BASE);
+      if (!res.ok) throw new Error("Fetch nhân viên thất bại");
+      const data = await res.json();
+      setStaffList(data.map(mapFromApi));
+    } catch (err) {
+      console.error(err);
+      message.error("Không tải được danh sách nhân viên");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadStaff();
+  }, []);
+
+  // ====== SEARCH ======
   const filteredStaff = useMemo(() => {
-    const keyword = searchText.toLowerCase();
+    const kw = searchText.toLowerCase();
     return staffList.filter(
       (s) =>
-        s.fullName.toLowerCase().includes(keyword) ||
-        s.code.toLowerCase().includes(keyword) ||
-        s.phone.toLowerCase().includes(keyword)
+        s.fullName.toLowerCase().includes(kw) ||
+        s.code.toLowerCase().includes(kw) ||
+        (s.phone || "").toLowerCase().includes(kw)
     );
   }, [staffList, searchText]);
 
-  // ====== Toggle trạng thái ======
-  const handleToggleStatus = (id, value) => {
-    setStaffList((prev) =>
-      prev.map((s) =>
-        s.id === id ? { ...s, isWorking: value } : s
-      )
-    );
+  // ====== Toggle trạng thái (khóa/mở) ======
+  const handleToggleStatus = async (id, value) => {
+    try {
+      const res = await fetch(`${API_BASE}/toggle-lock/${id}`, {
+        method: "PATCH",
+      });
+      if (!res.ok) throw new Error("Toggle lock thất bại");
+
+      await loadStaff();
+      message.success(value ? "Đã mở khóa nhân viên" : "Đã khóa nhân viên");
+    } catch (err) {
+      console.error(err);
+      message.error("Không thể đổi trạng thái nhân viên");
+    }
   };
 
-  // ====== Lương & ca làm ======
+  // ====== Lương & ca làm (SalaryModal) ======
   const handleViewSalary = (staff) => {
     setSalaryStaff(staff);
+
     salaryForm.setFieldsValue({
-      baseSalary: staff.baseSalary || 0,
+      shiftsCount: staff.shiftsCount || 0,
       allowance: staff.allowance || 0,
-      totalSalary: (staff.baseSalary || 0) + (staff.allowance || 0),
-      shift: staff.shift || "Ca sáng",
+      totalSalary: staff.totalSalary || 0,
+      shift: staff.shift || "Ca 1 (6h-12h)",
       isWorking: staff.isWorking,
     });
+
     setSalaryModalVisible(true);
   };
 
-  const handleSubmitSalary = () => {
-    salaryForm
-      .validateFields()
-      .then((values) => {
-        setStaffList((prev) =>
-          prev.map((s) =>
-            s.id === salaryStaff.id
-              ? {
-                ...s,
-                baseSalary: values.baseSalary,
-                allowance: values.allowance,
-                shift: values.shift,
-                isWorking: values.isWorking,
-              }
-              : s
-          )
-        );
-        setSalaryModalVisible(false);
-        setSalaryStaff(null);
-        message.success("Cập nhật lương & ca làm thành công");
-      })
-      .catch(() => { });
+  const handleSubmitSalary = async () => {
+    try {
+      const values = await salaryForm.validateFields();
+
+      const updatedStaff = {
+        ...salaryStaff,
+        shiftsCount: Number(values.shiftsCount || 0),
+        allowance: Number(values.allowance || 0),
+        shift: values.shift,
+        isWorking: values.isWorking,
+      };
+
+      updatedStaff.totalSalary = calcTotalSalary(
+        updatedStaff.shiftsCount,
+        updatedStaff.allowance,
+        updatedStaff.shift
+      );
+
+      const payload = buildPayload(updatedStaff);
+
+      const res = await fetch(`${API_BASE}/${salaryStaff.code}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error("Update lương thất bại");
+
+      message.success("Cập nhật lương & ca làm thành công");
+
+      setSalaryModalVisible(false);
+      setSalaryStaff(null);
+
+      setStaffList((prev) =>
+        prev.map((s) => (s.id === updatedStaff.id ? updatedStaff : s))
+      );
+    } catch (err) {
+      if (err?.errorFields) return; // lỗi form
+      console.error(err);
+      message.error("Không thể cập nhật lương");
+    }
   };
 
-  // ====== Thêm / sửa nhân viên ======
+  // ====== Thêm / sửa nhân viên (EditModal) ======
   const openAddStaff = () => {
     setEditMode("add");
     setEditingStaff(null);
     editForm.resetFields();
     editForm.setFieldsValue({
-      shift: "Ca sáng",
+      shift: "Ca 1 (6h-12h)",
+      shiftsCount: 0,
+      allowance: 200000,
     });
     setEditModalVisible(true);
   };
@@ -157,7 +242,7 @@ const StaffManagementPage = () => {
       address: staff.address,
       role: staff.role,
       shift: staff.shift,
-      baseSalary: staff.baseSalary,
+      shiftsCount: staff.shiftsCount,
       allowance: staff.allowance,
       username: staff.username,
       password: "",
@@ -165,46 +250,121 @@ const StaffManagementPage = () => {
     setEditModalVisible(true);
   };
 
-  const handleSubmitEdit = () => {
-    editForm
-      .validateFields()
-      .then((values) => {
-        if (editMode === "add") {
-          const nextIndex = staffList.length + 1;
-          const newStaff = {
-            id: Date.now(),
-            code: `NV${String(nextIndex).padStart(3, "0")}`,
-            isWorking: true,
-            ...values,
-          };
-          setStaffList((prev) => [...prev, newStaff]);
-          message.success("Thêm nhân viên mới thành công");
-        } else if (editingStaff) {
-          setStaffList((prev) =>
-            prev.map((s) =>
-              s.id === editingStaff.id ? { ...s, ...values } : s
-            )
-          );
-          message.success("Cập nhật nhân viên thành công");
-        }
+  const handleSubmitEdit = async () => {
+    try {
+      const values = await editForm.validateFields();
 
-        setEditModalVisible(false);
-        setEditingStaff(null);
-      })
-      .catch(() => { });
+      if (editMode === "add") {
+        const newCode = getNextStaffCode(staffList);
+
+        const newStaff = {
+          id: newCode,
+          code: newCode,
+          fullName: values.fullName,
+          role: values.role,
+          phone: values.phone,
+          address: values.address || "",
+          shift: values.shift,
+          shiftsCount: Number(values.shiftsCount || 0),
+          allowance: Number(values.allowance || 0),
+          totalSalary: 0, // tính ngay sau
+          username: values.username,
+          password: values.password,
+          isWorking: true,
+        };
+
+        newStaff.totalSalary = calcTotalSalary(
+          newStaff.shiftsCount,
+          newStaff.allowance,
+          newStaff.shift
+        );
+
+        const payload = buildPayload(newStaff);
+
+        const res = await fetch(API_BASE, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) throw new Error("Thêm nhân viên thất bại");
+
+        const json = await res.json();
+        const created = mapFromApi(json.data);
+
+        // Ghi đè lại mấy field FE (phòng trường hợp API chưa trả đủ)
+        created.shiftsCount = newStaff.shiftsCount;
+        created.allowance = newStaff.allowance;
+        created.totalSalary = newStaff.totalSalary;
+
+        setStaffList((prev) => [...prev, created]);
+        message.success("Thêm nhân viên mới thành công");
+      } else if (editingStaff) {
+        const updatedStaff = {
+          ...editingStaff,
+          fullName: values.fullName,
+          phone: values.phone,
+          address: values.address || "",
+          role: values.role,
+          shift: values.shift,
+          shiftsCount: Number(values.shiftsCount || 0),
+          allowance: Number(values.allowance || 0),
+          username: values.username,
+          password: values.password || editingStaff.password,
+        };
+
+        updatedStaff.totalSalary = calcTotalSalary(
+          updatedStaff.shiftsCount,
+          updatedStaff.allowance,
+          updatedStaff.shift
+        );
+
+        const payload = buildPayload(updatedStaff);
+
+        const res = await fetch(`${API_BASE}/${editingStaff.code}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error("Cập nhật nhân viên thất bại");
+
+        setStaffList((prev) =>
+          prev.map((s) => (s.id === editingStaff.id ? updatedStaff : s))
+        );
+        message.success("Cập nhật nhân viên thành công");
+      }
+
+      setEditModalVisible(false);
+      setEditingStaff(null);
+    } catch (err) {
+      if (err?.errorFields) return; // lỗi form
+      console.error(err);
+      message.error("Không thể lưu nhân viên");
+    }
   };
 
-  // ====== Xóa nhân viên ======
-  const handleDeleteStaff = (id) => {
-    setStaffList((prev) => prev.filter((s) => s.id !== id));
-    message.success("Đã xóa nhân viên");
+  // ====== Xóa ======
+  const handleDeleteStaff = async (id) => {
+    const target = staffList.find((s) => s.id === id);
+    if (!target) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/${target.code}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Xóa nhân viên thất bại");
+
+      setStaffList((prev) => prev.filter((s) => s.id !== id));
+      message.success("Đã xóa nhân viên");
+    } catch (err) {
+      console.error(err);
+      message.error("Không thể xóa nhân viên");
+    }
   };
 
   return (
     <Layout className="pm-layout">
       <Content className="pm-content">
-        <Topbar activeTab="staff" />
-
         <div className="pm-main-card">
           <div className="pm-main-header">
             <h2>Quản lý nhân viên</h2>
@@ -234,7 +394,6 @@ const StaffManagementPage = () => {
           />
         </div>
 
-        {/* Modal lương & ca làm */}
         <StaffSalaryModal
           visible={salaryModalVisible}
           staff={salaryStaff}
@@ -246,7 +405,6 @@ const StaffManagementPage = () => {
           onSubmit={handleSubmitSalary}
         />
 
-        {/* Modal thêm / sửa nhân viên */}
         <StaffEditModal
           visible={editModalVisible}
           mode={editMode}

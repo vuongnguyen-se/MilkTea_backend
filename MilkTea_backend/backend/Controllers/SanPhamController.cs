@@ -86,7 +86,7 @@ namespace backend.Controllers
             }
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{idUpdate}")]
         public IActionResult UpdateSanPham(string idUpdate,[FromBody] SanPham updatedSanPham)
         {
             var existingSanPham = _context.SanPham.FirstOrDefault(eachSP => eachSP.idSP == idUpdate);
@@ -110,7 +110,7 @@ namespace backend.Controllers
             });
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{idDelete}")]
         public IActionResult DeleteSanPham(string idDelete)
         {
             var existingSP = _context.SanPham.FirstOrDefault(sanpham => sanpham.idSP == idDelete);

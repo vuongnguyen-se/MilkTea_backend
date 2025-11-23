@@ -18,5 +18,8 @@ namespace backend.SingleClass
         [Column("ngayKetThuc")]
         public DateTime ngayKetThuc { get; set; }
 
+        [Column("TenKhuyenMai")]
+        public string? tenKhuyenMai { get; set; }
+
     }
 }

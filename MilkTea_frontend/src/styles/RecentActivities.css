@@ -1,7 +1,11 @@
-.recent{
+.recent {
   background-color: #fff !important;
-  margin-top: 30px; 
+  margin-top: 30px;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.212);
 }
+
 .recent-list {
   margin-top: 16px;
 }

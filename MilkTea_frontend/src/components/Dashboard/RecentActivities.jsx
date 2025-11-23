@@ -3,7 +3,7 @@ import "../../styles/RecentActivities.css";
 export default function RecentActivities({ data }) {
   return (
     <div className="recent">
-      <h3 style={{ marginBottom: 10, fontSize: 22 }}>Hoạt động gần đây</h3>
+      <h3 style={{ marginBottom: 10, fontSize: 22, color: "#074799", fontWeight: "bold" }}>Hoạt động gần đây</h3>
 
       <div className="recent-list" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
         {data.map((item, i) => (

@@ -6,6 +6,9 @@ import {
   DeleteOutlined,
 } from "@ant-design/icons";
 
+const formatCurrency = (v) =>
+  (v || 0).toLocaleString("vi-VN", { style: "currency", currency: "VND" });
+
 const StaffTable = ({
   staffList,
   onToggleStatus,
@@ -14,41 +17,36 @@ const StaffTable = ({
   onDeleteStaff,
 }) => {
   const columns = [
+    { title: "Mã NV", dataIndex: "code", key: "code", width: 90 },
+    { title: "Họ Tên", dataIndex: "fullName", key: "fullName", ellipsis: true },
+    { title: "Chức vụ", dataIndex: "role", key: "role", width: 120 },
+    { title: "SĐT", dataIndex: "phone", key: "phone", width: 120 },
+    { title: "Ca làm", dataIndex: "shift", key: "shift", width: 150 },
     {
-      title: "Mã NV",
-      dataIndex: "code",
-      key: "code",
-      width: 100,
+      title: "Số ca / tháng",
+      dataIndex: "shiftsCount",
+      key: "shiftsCount",
+      width: 120,
     },
     {
-      title: "Họ Tên",
-      dataIndex: "fullName",
-      key: "fullName",
-      ellipsis: true,
+      title: "Phụ cấp",
+      dataIndex: "allowance",
+      key: "allowance",
+      width: 120,
+      render: (v) => formatCurrency(v),
     },
     {
-      title: "Chức vụ",
-      dataIndex: "role",
-      key: "role",
+      title: "Tổng lương",
+      dataIndex: "totalSalary",
+      key: "totalSalary",
       width: 140,
-    },
-    {
-      title: "SĐT",
-      dataIndex: "phone",
-      key: "phone",
-      width: 140,
-    },
-    {
-      title: "Ca làm",
-      dataIndex: "shift",
-      key: "shift",
-      width: 140,
+      render: (v) => formatCurrency(v),
     },
     {
       title: "Trạng thái",
       dataIndex: "isWorking",
       key: "isWorking",
-      width: 140,
+      width: 150,
       render: (value, record) => (
         <Space>
           <Switch

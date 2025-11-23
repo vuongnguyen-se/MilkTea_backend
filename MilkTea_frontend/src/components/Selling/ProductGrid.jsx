@@ -2,8 +2,25 @@ import React from "react";
 import { Button, Card, List } from "antd";
 import { HomeOutlined, LogoutOutlined } from "@ant-design/icons";
 import { formatCurrency } from "../utils/formatCurrency.jsx";
+import { useNavigate } from "react-router-dom";
 
-const ProductGrid = ({ products, onSelectProduct }) => {
+const ProductGrid = ({ products, onSelectProduct, onFilter, filterType }) => {
+  const navigate = useNavigate();
+  // Khi chọn sản phẩm
+  const handleSelect = (product) => {
+    // Topping → không mở modal
+    if (product.type === 0) {
+      onSelectProduct({
+        ...product,
+        isToppingOnly: true
+      });
+      return;
+    }
+
+    // Nước → mở modal cấu hình
+    onSelectProduct(product);
+  };
+
   return (
     <div className="sales-column sales-products">
 
@@ -17,19 +34,34 @@ const ProductGrid = ({ products, onSelectProduct }) => {
         </div>
 
         <div className="left-header-actions">
-          <Button icon={<HomeOutlined />}>Trở về Dashboard</Button>
-          <Button danger icon={<LogoutOutlined />}>Đăng xuất</Button>
+          <Button icon={<HomeOutlined />} onClick={() => navigate("/")}>
+            Trở về Dashboard
+          </Button>
         </div>
       </div>
 
       {/* ===== NAVBAR ===== */}
       <div className="product-navbar">
-        <Button type="default">Quản lý sản phẩm</Button>
-        <Button type="default">Báo cáo</Button>
-        <Button type="default">Quản lý nguyên liệu</Button>
-        <Button type="default">Quản lý nhân viên</Button>
-        <Button type="primary" className="active">Tất Cả</Button>
-        <Button type="default">Thức uống</Button>
+        <Button
+          type={filterType === "all" ? "primary" : "default"}
+          onClick={() => onFilter("all")}
+        >
+          Tất Cả
+        </Button>
+
+        <Button
+          type={filterType === "drink" ? "primary" : "default"}
+          onClick={() => onFilter("drink")}
+        >
+          Thức uống
+        </Button>
+
+        <Button
+          type={filterType === "topping" ? "primary" : "default"}
+          onClick={() => onFilter("topping")}
+        >
+          Topping
+        </Button>
       </div>
 
       {/* ===== GRID SẢN PHẨM ===== */}

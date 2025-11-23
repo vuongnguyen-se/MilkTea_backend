@@ -3,7 +3,14 @@ import { Modal, Form, Input, InputNumber, Select, Switch } from "antd";
 
 const { Option } = Select;
 
-const SHIFT_OPTIONS = ["Ca sáng", "Ca tối", "Cả ngày"];
+const SHIFT_OPTIONS = [
+  "Ca 1 (6h-12h)",
+  "Ca 2 (12h-18h)",
+  "Ca 3 (16h-22h)",
+  "Cả ngày",
+];
+
+const PER_SHIFT_SALARY = 180000;
 
 const StaffSalaryModal = ({
   visible,
@@ -12,8 +19,6 @@ const StaffSalaryModal = ({
   onCancel,
   onSubmit,
 }) => {
-  const isEdit = !!staff;
-
   return (
     <Modal
       open={visible}
@@ -29,13 +34,22 @@ const StaffSalaryModal = ({
         form={form}
         layout="vertical"
         onValuesChange={(changed, all) => {
-          const base = Number(all.baseSalary || 0);
+          let soCa = Number(all.shiftsCount || 0);
           const allowance = Number(all.allowance || 0);
-          const total = base + allowance;
-          form.setFieldsValue({ totalSalary: total });
+
+          // Nếu chọn "Cả ngày" → số ca tính lương = số ca * 3
+          const shift = all.shift || staff?.shift || "";
+          const normalizedShifts =
+            shift === "Cả ngày" ? soCa * 3 : soCa;
+
+          const total = normalizedShifts * PER_SHIFT_SALARY + allowance;
+
+          form.setFieldsValue({
+            totalSalary: total,
+          });
         }}
       >
-        <Form.Item label="Họ Tên nhân viên">
+        <Form.Item label="Họ tên">
           <Input value={staff?.fullName} disabled />
         </Form.Item>
 
@@ -44,27 +58,23 @@ const StaffSalaryModal = ({
         </Form.Item>
 
         <Form.Item
-          label="Lương cơ bản (VND)"
-          name="baseSalary"
-          rules={[{ required: true, message: "Nhập lương cơ bản" }]}
+          label="Số ca làm trong tháng"
+          name="shiftsCount"
+          rules={[{ required: true, message: "Nhập số ca làm" }]}
         >
-          <InputNumber
-            min={0}
-            step={100000}
-            style={{ width: "100%" }}
-          />
+          <InputNumber min={0} step={1} style={{ width: "100%" }} />
+        </Form.Item>
+
+        <Form.Item label="Lương mỗi ca 6 tiếng(VND)">
+          <Input value={PER_SHIFT_SALARY.toLocaleString()} disabled />
         </Form.Item>
 
         <Form.Item
-          label="Phụ cấp (VND)"
+          label="Phụ cấp (VND/tháng)"
           name="allowance"
           rules={[{ required: true, message: "Nhập phụ cấp" }]}
         >
-          <InputNumber
-            min={0}
-            step={50000}
-            style={{ width: "100%" }}
-          />
+          <InputNumber min={0} step={50000} style={{ width: "100%" }} />
         </Form.Item>
 
         <Form.Item label="Tổng lương (VND)" name="totalSalary">
@@ -72,7 +82,7 @@ const StaffSalaryModal = ({
         </Form.Item>
 
         <Form.Item
-          label="Ca làm"
+          label="Ca làm chính"
           name="shift"
           rules={[{ required: true, message: "Chọn ca làm" }]}
         >

@@ -1,0 +1,10 @@
+using backend.SingleClass;
+
+namespace backend.SingleClass
+{
+  public class LoginRequest
+  {
+    public string? username { get; set; }
+    public string? password { get; set; }
+  }
+}

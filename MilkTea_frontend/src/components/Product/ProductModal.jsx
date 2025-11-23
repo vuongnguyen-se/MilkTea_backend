@@ -1,10 +1,18 @@
+// src/components/Product/ProductModal.jsx
 import React from "react";
 import { Modal, Form, Input, Select, InputNumber, Switch } from "antd";
 import "../../styles/ProductManagementPage.css";
 
 const { Option } = Select;
 
-const ProductModal = ({ visible, form, editingProduct, onCancel, onSubmit }) => {
+const ProductModal = ({
+  visible,
+  form,
+  editingProduct,
+  onCancel,
+  onSubmit,
+  onCategoryChange, // ✅ thêm prop
+}) => {
   return (
     <Modal
       open={visible}
@@ -14,26 +22,30 @@ const ProductModal = ({ visible, form, editingProduct, onCancel, onSubmit }) => 
       cancelText="Hủy"
       title={editingProduct ? "Chỉnh sửa sản phẩm" : "Thêm sản phẩm mới"}
       width={620}
-      destroyOnClose
+      destroyOnHidden
     >
       <Form layout="vertical" form={form}>
         <div className="pm-modal-grid">
           <Form.Item
             label="Mã sản phẩm"
             name="code"
-            rules={[{ required: true }]}
+            rules={[{ required: true, message: "Mã sản phẩm là bắt buộc" }]}
           >
-            <Input />
+            <Input placeholder="Sẽ tự sinh theo loại sản phẩm" />
           </Form.Item>
 
           <Form.Item
             label="Loại sản phẩm"
             name="category"
-            rules={[{ required: true }]}
+            rules={[{ required: true, message: "Chọn loại sản phẩm" }]}
           >
-            <Select>
-              <Option value="drink">Thức uống</Option>
-              <Option value="topping">Topping</Option>
+            <Select
+              onChange={(value) => {
+                if (onCategoryChange) onCategoryChange(value);
+              }}
+            >
+              <Option value="ThucUong">Thức uống</Option>
+              <Option value="Topping">Topping</Option>
             </Select>
           </Form.Item>
         </div>
@@ -41,7 +53,7 @@ const ProductModal = ({ visible, form, editingProduct, onCancel, onSubmit }) => 
         <Form.Item
           label="Tên sản phẩm"
           name="name"
-          rules={[{ required: true }]}
+          rules={[{ required: true, message: "Nhập tên sản phẩm" }]}
         >
           <Input />
         </Form.Item>
@@ -49,7 +61,7 @@ const ProductModal = ({ visible, form, editingProduct, onCancel, onSubmit }) => 
         <Form.Item
           label="Giá (VND)"
           name="price"
-          rules={[{ required: true }]}
+          rules={[{ required: true, message: "Nhập giá" }]}
         >
           <InputNumber
             style={{ width: "100%" }}
@@ -68,7 +80,7 @@ const ProductModal = ({ visible, form, editingProduct, onCancel, onSubmit }) => 
           <Input />
         </Form.Item>
 
-        <Form.Item label="Còn hàng" name="inStock" valuePropName="checked">
+        <Form.Item label="Còn bán" name="inStock" valuePropName="checked">
           <Switch />
         </Form.Item>
       </Form>

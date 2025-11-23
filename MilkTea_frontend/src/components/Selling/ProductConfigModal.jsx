@@ -1,8 +1,10 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Modal, Radio, Checkbox, Divider, Space } from 'antd';
-import { SIZES, SUGAR_LEVELS, ICE_LEVELS, TOPPINGS } from '../data/products.jsx';
+import { SIZES, SUGAR_LEVELS, ICE_LEVELS } from '../data/products.jsx';
 import { formatCurrency } from '../utils/formatCurrency.jsx';
 import '../../styles/Selling.css';
+
+const API_SANPHAM = "http://localhost:5159/shopAPI/SanPham";
 
 const ProductConfigModal = ({
   visible,
@@ -14,6 +16,31 @@ const ProductConfigModal = ({
   const [sugar, setSugar] = useState(100);
   const [ice, setIce] = useState(100);
   const [selectedToppings, setSelectedToppings] = useState([]);
+
+  // ✔ NEW — danh sách topping lấy từ DB
+  const [toppingsFromDB, setToppingsFromDB] = useState([]);
+
+  // ================================
+  // 🔥 Tải topping có loaiSP = 0 từ DB
+  // ================================
+  useEffect(() => {
+    const fetchToppings = async () => {
+      try {
+        const res = await fetch(API_SANPHAM);
+        const data = await res.json();
+
+        const list = data.data || data;
+
+        const toppings = list.filter(sp => sp.loaiSP === 0 && sp.tinhtrang === true);
+
+        setToppingsFromDB(toppings);
+      } catch (err) {
+        console.error("Lỗi load topping từ DB:", err);
+      }
+    };
+
+    fetchToppings();
+  }, []);
 
   const resetState = () => {
     setSize('M');
@@ -29,40 +56,51 @@ const ProductConfigModal = ({
 
   const handleOk = () => {
     if (!product) return;
-    const sizeInfo = SIZES.find((s) => s.value === size);
-    const toppingsInfo = TOPPINGS.filter((t) =>
-      selectedToppings.includes(t.id),
-    );
 
-    const toppingsTotal = toppingsInfo.reduce(
+    // Convert list topping được chọn sang dạng BE yêu cầu
+    const toppingObjects = toppingsFromDB
+      .filter(t => selectedToppings.includes(t.idSP))
+      .map(t => ({
+        id: t.idSP,
+        name: t.tenSP,
+        price: t.giaSP,
+      }));
+
+    const totalToppingPrice = toppingObjects.reduce(
       (sum, t) => sum + t.price,
-      0,
+      0
     );
-    const itemPrice = product.basePrice + (sizeInfo?.priceDiff || 0) + toppingsTotal;
 
-    onAddToCart({
+    const totalPrice = product.basePrice + totalToppingPrice;
+
+    const cartItem = {
       id: `${product.id}-${Date.now()}`,
       productId: product.id,
       name: product.name,
-      size: size,
+      size,
       sugar,
       ice,
-      toppings: toppingsInfo,
+      toppings: toppingObjects,
       quantity: 1,
-      price: itemPrice,
-    });
+      price: totalPrice,
+      isToppingOnly: false,
+    };
 
-    resetState();
+    onAddToCart(cartItem);
+    handleClose();
   };
 
   const totalPrice = useMemo(() => {
     if (!product) return 0;
+
     const sizeInfo = SIZES.find((s) => s.value === size);
-    const toppingsTotal = TOPPINGS.filter((t) =>
-      selectedToppings.includes(t.id),
-    ).reduce((sum, t) => sum + t.price, 0);
+
+    const toppingsTotal = toppingsFromDB
+      .filter((t) => selectedToppings.includes(t.idSP))
+      .reduce((sum, t) => sum + t.giaSP, 0);
+
     return product.basePrice + (sizeInfo?.priceDiff || 0) + toppingsTotal;
-  }, [product, size, selectedToppings]);
+  }, [product, size, selectedToppings, toppingsFromDB]);
 
   if (!product) return null;
 
@@ -75,6 +113,7 @@ const ProductConfigModal = ({
       footer={null}
       destroyOnClose
     >
+      {/* SIZE */}
       <div className="product-modal-section">
         <div className="section-label">Size</div>
         <Radio.Group
@@ -93,6 +132,7 @@ const ProductConfigModal = ({
 
       <Divider />
 
+      {/* ĐƯỜNG */}
       <div className="product-modal-section">
         <div className="section-label">Đường</div>
         <Radio.Group
@@ -109,6 +149,7 @@ const ProductConfigModal = ({
         </Radio.Group>
       </div>
 
+      {/* ĐÁ */}
       <div className="product-modal-section">
         <div className="section-label">Đá</div>
         <Radio.Group
@@ -127,20 +168,20 @@ const ProductConfigModal = ({
 
       <Divider />
 
+      {/* TOPPING */}
       <div className="product-modal-section">
         <div className="section-label">Topping</div>
+
         <Checkbox.Group
           value={selectedToppings}
           onChange={(values) => setSelectedToppings(values)}
-          style={{ width: '100%' }}
+          style={{ width: "100%" }}
         >
-          <Space direction="vertical" style={{ width: '100%' }}>
-            {TOPPINGS.map((t) => (
-              <div key={t.id} className="topping-row">
-                <Checkbox value={t.id}>{t.name}</Checkbox>
-                <span className="topping-price">
-                  +{formatCurrency(t.price)}
-                </span>
+          <Space direction="vertical" style={{ width: "100%" }}>
+            {toppingsFromDB.map((t) => (
+              <div key={t.idSP} className="topping-row">
+                <Checkbox value={t.idSP}>{t.tenSP}</Checkbox>
+                <span className="topping-price">+{formatCurrency(t.giaSP)}</span>
               </div>
             ))}
           </Space>
@@ -149,14 +190,13 @@ const ProductConfigModal = ({
 
       <Divider />
 
+      {/* FOOTER */}
       <div className="product-modal-footer">
         <div className="product-modal-total">
           Tổng tiền: <strong>{formatCurrency(totalPrice)}</strong>
         </div>
-        <button
-          className="btn-primary"
-          onClick={handleOk}
-        >
+
+        <button className="btn-primary" onClick={handleOk}>
           Thêm vào giỏ - {formatCurrency(totalPrice)}
         </button>
       </div>

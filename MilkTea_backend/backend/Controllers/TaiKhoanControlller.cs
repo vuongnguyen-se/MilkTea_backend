@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using backend.Models;
 using backend.SingleClass;
 using Microsoft.IdentityModel.Tokens;
+using static backend.SingleClass.Enum;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.Controllers
 {
@@ -25,7 +27,7 @@ namespace backend.Controllers
         }
 
         // GET: shopAPI/TaiKhoan/KH001
-        [HttpGet("{id}")]
+        [HttpGet("by-id/{id}")]
         public IActionResult GetTaiKhoanById(string id)
         {
             var tk = _context.TaiKhoan.FirstOrDefault(x => x.idTK == id);
@@ -113,5 +115,31 @@ namespace backend.Controllers
                 trangThai = taiKhoan.biKhoa
             });
         }
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequest req)
+        {
+            var tk = await _context.TaiKhoan
+                .FirstOrDefaultAsync(t => t.tenDN == req.username
+                                       && t.mKhau == req.password);
+
+            if (tk == null)
+                return BadRequest("Sai tên đăng nhập hoặc mật khẩu!");
+
+            // Chặn khách hàng đăng nhập
+            if (tk.vaiTro == vaiTroTaiKhoan.KhachHang)
+                return BadRequest("Tài khoản khách hàng không được phép đăng nhập hệ thống!");
+
+            // Kiểm tra tài khoản bị khoá
+            if (tk.biKhoa)
+                return BadRequest("Tài khoản đã bị khoá!");
+
+            return Ok(new
+            {
+                id = tk.idTK,
+                username = tk.tenTK,
+                role = tk.vaiTro.ToString()
+            });
+        }
+
     }
 }

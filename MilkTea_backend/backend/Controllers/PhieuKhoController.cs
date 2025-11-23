@@ -23,6 +23,7 @@ namespace backend.Controllers
             var data = await _context.PhieuKho
                 .Include(p => p.NguyenLieu)
                 .Include(p => p.NhaCungCap)
+                .OrderByDescending(p => p.idPhieu)
                 .ToListAsync();
             return Ok(new { message = "Lấy danh sách phiếu kho thành công!", data });
         }
@@ -71,5 +72,87 @@ namespace backend.Controllers
                 data = model
             });
         }
+        private async Task<string> GenerateNewPhieuId()
+        {
+            // Lấy phiếu mới nhất theo ID (PKxxx)
+            var lastPhieu = await _context.PhieuKho
+                .OrderByDescending(p => p.idPhieu)
+                .FirstOrDefaultAsync();
+
+            if (lastPhieu == null)
+                return "PK001";
+
+            string? lastId = lastPhieu.idPhieu; // ví dụ PK015
+            int num = int.Parse(lastId.Substring(2)); // lấy số: 15
+            num++;
+
+            return "PK" + num.ToString("D3"); // thành PK016
+        }
+
+        [HttpPost("Nhap")]
+        public async Task<IActionResult> NhapKho([FromBody] NhapKhoRequest request)
+        {
+            if (request.items == null || !request.items.Any())
+                return BadRequest(new { message = "Danh sách nguyên liệu nhập không được rỗng" });
+
+            foreach (var item in request.items)
+            {
+                var nl = await _context.NguyenLieu.FindAsync(item.idNL);
+                if (nl == null) continue;
+
+                var newId = await GenerateNewPhieuId();
+
+                var phieu = new PhieuKho
+                {
+                    idPhieu = newId,
+                    idNL = item.idNL,
+                    idNCC = request.idNCC,
+                    soLuong = item.soLuong,
+                    ngay = DateTime.Now,
+                    loaiPhieu = loaiPhieuKho.Nhap,
+                    ghiChu = request.ghiChu,
+                };
+
+                _context.PhieuKho.Add(phieu);
+
+                // Cập nhật kho
+                nl.soLuongTon += item.soLuong;
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Nhập kho thành công" });
+        }
+
+
+        [HttpPost("Xuat")]
+        public async Task<IActionResult> XuatKho([FromBody] XuatKhoRequest request)
+        {
+            var nl = await _context.NguyenLieu.FindAsync(request.idNL);
+            if (nl == null) return NotFound(new { message = "Không tìm thấy nguyên liệu" });
+
+            if (nl.soLuongTon < request.soLuong)
+                return BadRequest(new { message = "Không đủ tồn kho" });
+
+            var phieu = new PhieuKho
+            {
+                idPhieu = "PK" + DateTime.Now.Ticks,
+                idNL = request.idNL,
+                idNCC = null,
+                soLuong = request.soLuong,
+                ngay = DateTime.Now,
+                loaiPhieu = loaiPhieuKho.Xuat,    // BE tự set
+                ghiChu = request.ghiChu
+            };
+
+            _context.PhieuKho.Add(phieu);
+
+            // Trừ kho
+            nl.soLuongTon -= request.soLuong;
+
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Xuất kho thành công" });
+        }
+
+
     }
 }

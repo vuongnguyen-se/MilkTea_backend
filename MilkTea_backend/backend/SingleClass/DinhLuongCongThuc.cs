@@ -10,7 +10,7 @@ namespace backend.SingleClass
         [Column("idNL")]
         public string? idNL { get; set; }
         [Column("soLuongTieuHao")]
-        public decimal soLuongTieuHao { get; set; }
+        public float soLuongTieuHao { get; set; }
         [Column("donVi")]
         public string? donVi { get; set; }
     }

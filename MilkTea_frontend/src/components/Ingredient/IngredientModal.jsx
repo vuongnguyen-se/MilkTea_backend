@@ -1,81 +1,93 @@
+// src/components/Ingredient/IngredientModal.jsx
 import React from "react";
-import { Modal, Form, Input, DatePicker, InputNumber, Switch } from "antd";
-import dayjs from "dayjs";
+import { Modal, Form, Input, InputNumber, Select } from "antd";
 import "../../styles/ProductManagementPage.css";
+
+const { Option } = Select;
 
 const IngredientModal = ({
   visible,
   form,
-  editingIngredient,
+  ingredient,
+  mode, // "nhap" | "xuat"
+  suppliers = [],
   onCancel,
   onSubmit,
 }) => {
+  if (!ingredient) return null;
+
+  const title =
+    mode === "nhap" ? "Nhập kho nguyên liệu" : "Xuất kho nguyên liệu";
+
   return (
     <Modal
       open={visible}
-      title={
-        editingIngredient ? "Chỉnh sửa nguyên liệu" : "Thêm nguyên liệu mới"
-      }
+      title={title}
       onCancel={onCancel}
       onOk={onSubmit}
-      okText={editingIngredient ? "Lưu" : "Thêm mới"}
+      okText={mode === "nhap" ? "Nhập kho" : "Xuất kho"}
       cancelText="Hủy"
-      width={620}
-      destroyOnClose
+      width={520}
+      destroyOnHidden
     >
+      {/* Info nguyên liệu */}
+      <div style={{ marginBottom: 12 }}>
+        <div>
+          <strong>Mã NL:</strong> {ingredient.code}
+        </div>
+        <div>
+          <strong>Tên NL:</strong> {ingredient.name}
+        </div>
+        <div>
+          <strong>Đơn vị:</strong> {ingredient.unit || "-"}
+        </div>
+        <div>
+          <strong>Hạn sử dụng:</strong> {ingredient.expiryDate || "-"}
+        </div>
+        <div>
+          <strong>Tồn hiện tại:</strong> {ingredient.quantity}
+        </div>
+      </div>
+
       <Form form={form} layout="vertical">
-        <Form.Item
-          label="Mã nguyên liệu"
-          name="code"
-          rules={[{ required: true, message: "Nhập mã nguyên liệu" }]}
-        >
-          <Input />
-        </Form.Item>
+        {/* Chỉ NHẬP mới cần chọn NCC */}
+        {mode === "nhap" && (
+          <Form.Item
+            label="Nhà cung cấp"
+            name="supplierId"
+            rules={[{ required: true, message: "Vui lòng chọn nhà cung cấp" }]}
+          >
+            <Select placeholder="Chọn nhà cung cấp">
+              {suppliers.map((s) => (
+                <Option key={s.id} value={s.id}>
+                  {s.name} ({s.id})
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+        )}
 
         <Form.Item
-          label="Tên nguyên liệu"
-          name="name"
-          rules={[{ required: true, message: "Nhập tên nguyên liệu" }]}
-        >
-          <Input placeholder="Trân Châu Đen..." />
-        </Form.Item>
-
-        <Form.Item
-          label="Hạn sử dụng"
-          name="expiryDate"
-          rules={[{ required: true, message: "Chọn hạn sử dụng" }]}
-        >
-          <DatePicker
-            format="DD/MM/YYYY"
-            style={{ width: "100%" }}
-            placeholder="Chọn ngày"
-          />
-        </Form.Item>
-
-        <Form.Item
-          label="Số lượng tồn"
+          label={mode === "nhap" ? "Số lượng nhập" : "Số lượng xuất"}
           name="quantity"
-          rules={[{ required: true, message: "Nhập số lượng tồn" }]}
+          rules={[{ required: true, message: "Vui lòng nhập số lượng" }]}
         >
           <InputNumber
+            min={1}
             style={{ width: "100%" }}
-            min={0}
-            step={1}
-            placeholder="0"
+            placeholder="VD: 10"
           />
         </Form.Item>
 
-        <Form.Item label="URL hình ảnh" name="imageUrl">
-          <Input placeholder="https://..." />
-        </Form.Item>
-
-        <Form.Item
-          label="Còn hàng"
-          name="isActive"
-          valuePropName="checked"
-        >
-          <Switch />
-        </Form.Item>
+        {/* Xuất: theo bạn chọn B (chỉ cần số lượng) → ẩn ghi chú */}
+        {mode === "nhap" && (
+          <Form.Item label="Ghi chú" name="note">
+            <Input.TextArea
+              rows={3}
+              placeholder="VD: Nhập lô mới từ NCC001..."
+            />
+          </Form.Item>
+        )}
       </Form>
     </Modal>
   );
