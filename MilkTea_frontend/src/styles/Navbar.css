@@ -1,36 +1,51 @@
 .navbar {
-  padding: 30px 50px ;
+  padding: 30px 50px;
   display: flex;
   justify-content: space-between;
-  justify-items: flex-start;
   border-bottom: 2px solid #cccbcb;
 }
 
-.navbar-left {
-  gap: 32px;
-  flex: 1;
-}
-
 .navbar-title {
-  margin: 0 0 20px 0;
-  font-size: 28px;
-  font-weight: bold;
-}
-ul li{
-  border: 1px solid #cccbcb;
-  margin-right: 10px !important;
-  border-radius: 9px !important;
-  font-size: 14px ;
-  font-weight: 600;
-}
-ul li:hover{
-  background-color: #dddddd6b !important;
-  
-}
-ul li span svg {
-  font-size: 16px;
+  margin-bottom: 16px;
+  font-size: 26px;
+  font-weight: 700;
 }
 
-.navbar-func .ant-menu-item::after {
-  display: none !important;
+/* Tabs giống Topbar */
+.navbar-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  /* Xuống 2 hàng hoặc nhiều hàng */
+  gap: 8px;
+  max-width: 900px;
+  /* Hàng 1 chứa khoảng 5 nút → hàng dưới 4 */
+}
+
+.navbar-tab {
+  border-radius: 20px !important;
+  white-space: nowrap !important;
+}
+
+.navbar-tab:hover {
+  background: #eee;
+}
+
+@media (max-width: 1530px) {
+  .navbar-tabs {
+    max-width: 700px;
+  }
+}
+
+@media (max-width: 1400px) {
+  .navbar-tabs {
+    max-width: 600px;
+  }
+}
+
+@media (max-width: 1280px) {
+  .navbar-tabs {
+    max-width: 500px;
+  }
+
+  /* Laptop 15.6 → tự chia 2 hàng */
 }

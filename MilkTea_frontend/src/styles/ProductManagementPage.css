@@ -101,3 +101,32 @@
   grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
+.pm-nav-tabs {
+  display: flex;
+  flex-wrap: wrap; /* 👉 Cho phép xuống 2 hàng */
+  gap: 8px;
+  align-items: center;
+  max-width: 900px; /* 👉 Giới hạn độ dài thanh menu */
+}
+
+.pm-nav-tabs button {
+  white-space: nowrap; /* Không cho text xuống dòng */
+}
+
+@media (max-width: 1530px) {
+  .pm-nav-tabs {
+    max-width: 700px; 
+  }
+}
+
+@media (max-width: 1400px) {
+  .pm-nav-tabs {
+    max-width: 600px;
+  }
+}
+
+@media (max-width: 1280px) {
+  .pm-nav-tabs {
+    max-width: 500px; /* 👉 Laptop 15.6 inch: tự chia thành 2 hàng */
+  }
+}

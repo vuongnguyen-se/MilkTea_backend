@@ -1,6 +1,6 @@
 /* eslint-disable */
 import React, { useEffect, useMemo, useState } from "react";
-import { Layout, Button, Input, Form, message } from "antd";
+import { Layout, Button, Input, Form, message, Select } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 
 import StaffTable from "../components/Staff/StaffTable.jsx";
@@ -104,6 +104,7 @@ const getNextStaffCode = (list) => {
 const StaffManagementPage = () => {
   const [staffList, setStaffList] = useState([]);
   const [searchText, setSearchText] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
 
   const [salaryModalVisible, setSalaryModalVisible] = useState(false);
   const [salaryStaff, setSalaryStaff] = useState(null);
@@ -139,13 +140,22 @@ const StaffManagementPage = () => {
   // ====== SEARCH ======
   const filteredStaff = useMemo(() => {
     const kw = searchText.toLowerCase();
-    return staffList.filter(
-      (s) =>
+    return staffList.filter((s) => {
+      const matchSearch =
         s.fullName.toLowerCase().includes(kw) ||
         s.code.toLowerCase().includes(kw) ||
-        (s.phone || "").toLowerCase().includes(kw)
-    );
-  }, [staffList, searchText]);
+        (s.phone || "").toLowerCase().includes(kw);
+
+      const matchStatus =
+        statusFilter === "all"
+          ? true
+          : statusFilter === "working"
+            ? s.isWorking === true
+            : s.isWorking === false;
+
+      return matchSearch && matchStatus;
+    });
+  }, [staffList, searchText, statusFilter]);
 
   // ====== Toggle trạng thái (khóa/mở) ======
   const handleToggleStatus = async (id, value) => {
@@ -383,7 +393,18 @@ const StaffManagementPage = () => {
               allowClear
               onChange={(e) => setSearchText(e.target.value)}
             />
+
+            <Select
+              style={{ width: 180, marginLeft: 12 }}
+              defaultValue="all"
+              onChange={(v) => setStatusFilter(v)}
+            >
+              <Select.Option value="all">Tất cả</Select.Option>
+              <Select.Option value="working">Đang làm</Select.Option>
+              <Select.Option value="quit">Nghỉ việc</Select.Option>
+            </Select>
           </div>
+
 
           <StaffTable
             staffList={filteredStaff}

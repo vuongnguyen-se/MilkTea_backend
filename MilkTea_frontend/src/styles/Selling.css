@@ -380,3 +380,39 @@
 .payment-box.active .payment-box-label {
   color: #fff !important;
 }
+.payment-method-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.payment-box {
+  flex: 1;
+  padding: 16px 8px;
+  border: 1px solid #d9d9d9;
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* icon + chữ ở giữa */
+  justify-content: center;
+}
+
+.payment-box-icon {
+  font-size: 32px;
+  /* icon lớn hơn */
+  margin-bottom: 6px;
+  /* icon cách chữ */
+}
+
+.payment-box-label {
+  font-size: 14px;
+}
+
+.payment-box.active {
+  border-color: #1677ff;
+  background: #e6f4ff;
+}

@@ -3,7 +3,7 @@ import { Modal, Form, Input, Select, InputNumber } from "antd";
 
 const { Option } = Select;
 
-const ROLE_OPTIONS = ["Quản lý", "Thu ngân", "Pha chế", "Phục vụ"];
+const ROLE_OPTIONS = ["Thu ngân", "Pha chế", "Phục vụ"];
 const SHIFT_OPTIONS = [
   "Ca 1 (6h-12h)",
   "Ca 2 (12h-18h)",

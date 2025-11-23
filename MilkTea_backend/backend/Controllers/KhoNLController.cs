@@ -35,7 +35,7 @@ namespace backend.Controllers
 
 
         [HttpPatch("{idNL}/nhap")]
-        public async Task<IActionResult> NhapKho(string idNL, [FromBody] int soLuong)
+        public async Task<IActionResult> NhapKho(string idNL, [FromBody] float soLuong)
         {
             var nl = await _context.NguyenLieu.FindAsync(idNL);
             if (nl == null) return NotFound($"Không tìm thấy nguyên liệu {idNL}");
@@ -47,7 +47,7 @@ namespace backend.Controllers
         }
 
         [HttpPatch("{idNL}/xuat")]
-        public async Task<IActionResult> XuatKho(string idNL, [FromBody] int soLuong)
+        public async Task<IActionResult> XuatKho(string idNL, [FromBody] float soLuong)
         {
             var nl = await _context.NguyenLieu.FindAsync(idNL);
             if (nl == null) return NotFound($"Không tìm thấy nguyên liệu {idNL}");

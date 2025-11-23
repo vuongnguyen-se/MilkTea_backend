@@ -131,5 +131,32 @@ namespace backend.Controllers
         data = activeList
       });
     }
+    // ========== CHECK PROMOTION BY CODE ==========
+    [HttpGet("Check")]
+    public async Task<IActionResult> CheckPromotion([FromQuery] string code)
+    {
+      if (string.IsNullOrWhiteSpace(code))
+        return BadRequest("Bạn chưa nhập mã!");
+
+      code = code.Trim().ToUpper();
+
+      var km = await _context.KhuyenMai
+          .FirstOrDefaultAsync(k => k.tenKhuyenMai.ToUpper() == code);
+
+      if (km == null)
+        return NotFound(new { message = "Mã khuyến mãi không tồn tại!" });
+
+      var now = DateTime.Now;
+
+      if (now < km.ngayBatDau || now > km.ngayKetThuc)
+        return BadRequest(new { message = "Mã khuyến mãi đã hết hạn!" });
+
+      return Ok(new
+      {
+        message = "Áp dụng mã thành công",
+        percent = km.phanTramGiam   // ví dụ 0.30 = 30%
+      });
+    }
+
   }
 }

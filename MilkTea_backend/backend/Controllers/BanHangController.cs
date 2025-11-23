@@ -17,24 +17,26 @@ namespace backend.Controllers
       _context = context;
     }
 
-    // ====== DTO nhận từ FE ======
+    // ==========================================
+    // DTO
+    // ==========================================
     public class CheckoutTopping
     {
-      public string? id { get; set; }       // id FE, không dùng nhiều bên BE
+      public string? id { get; set; }
       public string? name { get; set; }
       public decimal price { get; set; }
     }
 
     public class CheckoutItem
     {
-      public string id { get; set; } = null!;         // id tạm FE
-      public string productId { get; set; } = null!;  // idSP: TS001, TP002...
+      public string id { get; set; } = null!;
+      public string productId { get; set; } = null!;
       public string name { get; set; } = null!;
-      public string size { get; set; } = "M";         // 'S' | 'M' | 'L'
+      public string size { get; set; } = "M";
       public int sugar { get; set; } = 100;
       public int ice { get; set; } = 100;
       public int quantity { get; set; } = 1;
-      public decimal price { get; set; }              // giá 1 ly (đã gồm topping)
+      public decimal price { get; set; }
       public List<CheckoutTopping> toppings { get; set; } = new();
     }
 
@@ -43,11 +45,14 @@ namespace backend.Controllers
       public List<CheckoutItem> items { get; set; } = new();
       public string? customerPhone { get; set; }
       public string? promotionCode { get; set; }
-      public string paymentMethod { get; set; } = "cash";  // cash | bank | ewallet
+      public string paymentMethod { get; set; } = "cash";
       public bool issuingInvoice { get; set; } = true;
-      public string? staffId { get; set; }  // tạm: bạn có thể truyền idNV từ FE sau
+      public string? staffId { get; set; }
     }
 
+    // ==========================================
+    // CHECKOUT
+    // ==========================================
     [HttpPost("Checkout")]
     public async Task<IActionResult> Checkout([FromBody] CheckoutRequest req)
     {
@@ -75,12 +80,12 @@ namespace backend.Controllers
         khach = await _context.KhachHang.FindAsync(tk.idTK);
       }
 
-      // ===== 2. Tính tiền giỏ hàng =====
+      // ===== 2. Tính tiền =====
       decimal subtotal = req.items.Sum(i => i.price * i.quantity);
       decimal tax = 0;
       decimal totalBeforeDiscount = subtotal;
 
-      // ===== 3. Áp khuyến mãi =====
+      // ===== 3. Khuyến mãi =====
       decimal discount = 0m;
       string? idKM = null;
 
@@ -96,15 +101,13 @@ namespace backend.Controllers
 
         var now = DateTime.Now;
         if (now < km.ngayBatDau || now > km.ngayKetThuc)
-          return BadRequest("Mã khuyến mãi đã hết hiệu lực!");
+          return BadRequest("Mã khuyến mãi đã hết hạn!");
 
-        // phanTramGiam trong DB đang là 0.20, 0.15, ...
         discount = totalBeforeDiscount * km.phanTramGiam;
         idKM = km.idKM;
       }
       else if (khach != null)
       {
-        // Không nhập mã thì giảm theo hạng (Đồng 2k, Bạc 3k, Vàng 4k, KimCương 6k)
         discount = khach.loaiKH switch
         {
           loaiKhachHang.Dong => 2000m,
@@ -118,18 +121,46 @@ namespace backend.Controllers
       decimal total = totalBeforeDiscount - discount;
       if (total < 0) total = 0;
 
-      // ===== 4. Sinh mã đơn DHxxx =====
+      // ==========================================
+      // 🔥 4. KIỂM TRA TỒN KHO TRƯỚC KHI TẠO ĐƠN
+      // ==========================================
+      foreach (var item in req.items)
+      {
+        var congThuc = await _context.DinhLuongCongThuc
+            .Where(x => x.idSP == item.productId)
+            .ToListAsync();
+
+        foreach (var ct in congThuc)
+        {
+          float required = ct.soLuongTieuHao * item.quantity;
+
+          var nl = await _context.NguyenLieu.FindAsync(ct.idNL);
+          if (nl == null)
+            return BadRequest($"Không tìm thấy nguyên liệu {ct.idNL}");
+
+          if (nl.soLuongTon < required)
+          {
+            return BadRequest(
+              $"Nguyên liệu '{nl.tenNL}' không đủ! Còn {nl.soLuongTon} {nl.donVi}, " +
+              $"cần {required} {nl.donVi} để pha {item.quantity} ly."
+            );
+          }
+        }
+      }
+
+      // ==========================================
+      // 5. Tạo đơn hàng
+      // ==========================================
       string newIdDH = await GenerateNewDonHangId();
 
-      // ===== 5. Tạo DonHang =====
       var donHang = new DonHang
       {
         idDH = newIdDH,
-        idKH = idKH,                               // null = khách lẻ
-        idNV = req.staffId ?? "NV001",             // tạm cứng, sau này bạn sửa
+        idKH = idKH,
+        idNV = req.staffId ?? "NV001",
         idKM = idKM,
         ngayDat = DateTime.Now,
-        trangThai = trangThaiDonHang.DangChuanBi,    // thanh toán xong -> hoàn thành
+        trangThai = trangThaiDonHang.ChoXacNhan,
         phuongThuc = MapPayment(req.paymentMethod),
         tinhTong = total,
         ghiChu = null
@@ -138,25 +169,24 @@ namespace backend.Controllers
       _context.DonHang.Add(donHang);
       await _context.SaveChangesAsync();
 
-      // ===== 6. Lưu ChiTietDonHang (mỗi món 1 dòng) =====
-      // 6. Lưu chi tiết đơn: nước + topping (mỗi cái 1 dòng)
-      // ===== 6. Lưu ChiTietDonHang: nước + topping (mỗi thứ 1 dòng) =====
+      // ==========================================
+      // 6. ChiTietDonHang (nước + topping)
+      // ==========================================
       foreach (var item in req.items)
       {
         if (string.IsNullOrWhiteSpace(item.productId))
           continue;
 
-        // Giá nước = giá item - tổng tiền topping
         decimal toppingTotal = item.toppings?.Sum(t => t.price) ?? 0m;
         decimal drinkUnitPrice = item.price - toppingTotal;
 
-        // Xử lý size
+        // size enum
         var sizeEnum = sizeChiTietDonHang.M;
         var s = item.size?.Trim().ToUpper();
         if (s == "S") sizeEnum = sizeChiTietDonHang.S;
         if (s == "L") sizeEnum = sizeChiTietDonHang.L;
 
-        // ---------- dòng NƯỚC ----------
+        // nước
         var drink = new ChiTietDonHang
         {
           idDH = newIdDH,
@@ -169,23 +199,20 @@ namespace backend.Controllers
         };
         _context.ChiTietDonHang.Add(drink);
 
-        // ---------- dòng TOPPING ----------
+        // topping
         if (item.toppings != null)
         {
           foreach (var tp in item.toppings)
           {
-            // tp.id = idSP thật vì FE lấy từ bảng SanPham
             var toppingSP = await _context.SanPham.FindAsync(tp.id);
             if (toppingSP == null) continue;
 
             var t = new ChiTietDonHang
             {
               idDH = newIdDH,
-              idSP = toppingSP.idSP,     // mã TP00x trong DB
-              soLuong = item.quantity,   // topping đi theo nước
-              donGia = toppingSP.giaSP,  // dùng giá trong DB
-
-              // Topping không có size/đường/đá → phải gán giá trị hợp lệ
+              idSP = toppingSP.idSP,
+              soLuong = item.quantity,
+              donGia = toppingSP.giaSP,
               size = sizeChiTietDonHang.M,
               duong = 0,
               da = 0
@@ -198,10 +225,12 @@ namespace backend.Controllers
 
       await _context.SaveChangesAsync();
 
-      // ===== 7. Tạo Hóa đơn ngay khi thanh toán =====
+      // ==========================================
+      // 7. Tạo hóa đơn
+      // ==========================================
       var hoaDon = new HoaDon
       {
-        maHD = Guid.NewGuid().ToString(),   // giống HoaDonController đang làm :contentReference[oaicite:8]{index=8}
+        maHD = Guid.NewGuid().ToString(),
         idDonHang = newIdDH,
         phuongThuc = donHang.phuongThuc,
         soTien = total,
@@ -211,10 +240,14 @@ namespace backend.Controllers
       _context.HoaDon.Add(hoaDon);
       await _context.SaveChangesAsync();
 
-      // ===== 8. Trừ kho theo định lượng + tạo phiếu xuất =====
+      // ==========================================
+      // 8. TRỪ KHO + Phiếu xuất đúng số lượng float
+      // ==========================================
       await ConsumeIngredientsAndCreatePhieuXuat(newIdDH);
 
-      // ===== 9. Trả kết quả cho FE =====
+      // ==========================================
+      // 9. Trả về FE
+      // ==========================================
       return Ok(new
       {
         idDH = newIdDH,
@@ -225,8 +258,9 @@ namespace backend.Controllers
       });
     }
 
-    // ========== HELPER ==========
-
+    // ==================================================================
+    // HELPER: Sinh mã đơn
+    // ==================================================================
     private async Task<string> GenerateNewDonHangId()
     {
       var last = await _context.DonHang
@@ -237,7 +271,6 @@ namespace backend.Controllers
       if (string.IsNullOrEmpty(last))
         return "DH001";
 
-      // format: DHxxx
       var numPart = int.Parse(last.Substring(2));
       return "DH" + (numPart + 1).ToString("D3");
     }
@@ -252,65 +285,56 @@ namespace backend.Controllers
       };
     }
 
-    /// <summary>
-    /// Dùng bảng dinhluongcongthuc để trừ KhoNL + tạo phiếu kho loại Xuất
-    /// </summary>
+    // ==================================================================
+    // TRỪ KHO + PHIẾU XUẤT (DÙNG FLOAT)
+    // ==================================================================
     private async Task ConsumeIngredientsAndCreatePhieuXuat(string idDH)
     {
-      // 1. Lấy toàn bộ chi tiết đơn
       var details = await _context.ChiTietDonHang
           .Where(c => c.idDH == idDH)
           .ToListAsync();
 
       if (!details.Any()) return;
 
-      // 2. Gom tổng tiêu hao theo idNL (float)
       var usage = new Dictionary<string, float>();
 
       foreach (var ct in details)
       {
-        var dinhLuongs = await _context.Set<DinhLuongCongThuc>()
+        var dinhLuongs = await _context.DinhLuongCongThuc
             .Where(d => d.idSP == ct.idSP)
             .ToListAsync();
 
         foreach (var dl in dinhLuongs)
         {
-          float amount = dl.soLuongTieuHao * ct.soLuong; // float * int
+          float amount = dl.soLuongTieuHao * ct.soLuong;
 
           if (!usage.ContainsKey(dl.idNL!))
-            usage[dl.idNL!] = 0f;
+            usage[dl.idNL!] = 0;
 
           usage[dl.idNL!] += amount;
         }
       }
 
-      if (!usage.Any()) return;
-
-      // 3. Với mỗi nguyên liệu: TRỪ KHO + tạo phiếu XUẤT
       foreach (var pair in usage)
       {
         string idNL = pair.Key;
-        float soLuongTieuHao = pair.Value;  // float
+        float used = pair.Value;
 
         var nl = await _context.NguyenLieu.FindAsync(idNL);
         if (nl == null) continue;
 
-        // Trừ tồn kho (float → float)
-        nl.soLuongTon -= soLuongTieuHao;
+        nl.soLuongTon -= used;
         if (nl.soLuongTon < 0) nl.soLuongTon = 0;
-
-        // Phiếu kho yêu cầu số lượng int → làm tròn lên
-        int soLuongPhieu = (int)Math.Ceiling(soLuongTieuHao);
 
         var phieu = new PhieuKho
         {
           idPhieu = "PK" + DateTime.Now.Ticks,
           idNL = idNL,
           idNCC = null,
-          soLuong = soLuongPhieu,
+          soLuong = used,       // float, chuẩn
           ngay = DateTime.Now,
           loaiPhieu = loaiPhieuKho.Xuat,
-          ghiChu = $"Xuất NL pha món ĐH {idDH}"
+          ghiChu = $"Xuất NL pha ĐH {idDH}"
         };
 
         _context.PhieuKho.Add(phieu);

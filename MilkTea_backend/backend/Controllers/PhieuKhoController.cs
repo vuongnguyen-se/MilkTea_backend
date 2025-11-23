@@ -17,106 +17,117 @@ namespace backend.Controllers
             _context = context;
         }
 
+        // =============================
+        // MODEL REQUEST CHUẨN
+        // =============================
+        public class NhapKhoItem
+        {
+            public string idNL { get; set; }
+            public float soLuong { get; set; }
+            public DateTime? hanSuDung { get; set; }
+        }
+
+        public class NhapKhoRequest
+        {
+            public string? idNCC { get; set; }
+            public string? ghiChu { get; set; }
+            public List<NhapKhoItem> items { get; set; } = new();
+        }
+
+        public class XuatKhoRequest
+        {
+            public string idNL { get; set; }
+            public float soLuong { get; set; }
+            public string? ghiChu { get; set; }
+        }
+
+
+        // ==============================
+        // GET ALL
+        // ==============================
         [HttpGet]
         public async Task<IActionResult> GetAllPhieu()
         {
             var data = await _context.PhieuKho
-                .Include(p => p.NguyenLieu)
-                .Include(p => p.NhaCungCap)
-                .OrderByDescending(p => p.idPhieu)
+                .Include(x => x.NguyenLieu)
+                .Include(x => x.NhaCungCap)
+                .OrderByDescending(x => x.idPhieu)
                 .ToListAsync();
+
             return Ok(new { message = "Lấy danh sách phiếu kho thành công!", data });
         }
 
+        // ==============================
+        // GET BY ID
+        // ==============================
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPhieuKhoById(string id)
         {
             var phieu = await _context.PhieuKho
-                .Include(p => p.NguyenLieu)
-                .Include(p => p.NhaCungCap)
-                .FirstOrDefaultAsync(p => p.idPhieu == id);
+                .Include(x => x.NguyenLieu)
+                .Include(x => x.NhaCungCap)
+                .FirstOrDefaultAsync(x => x.idPhieu == id);
 
             if (phieu == null)
-                return NotFound($"Không tìm thấy phiếu kho {id}");
+                return NotFound($"Không tìm thấy phiếu {id}");
 
             return Ok(phieu);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> TaoPhieu([FromBody] PhieuKho model)
-        {
-            if (model == null) return BadRequest("Phiếu không hợp lệ");
 
-            model.idPhieu = Guid.NewGuid().ToString();
-            model.ngay = DateTime.Now;
-
-            // Cập nhật tồn kho
-            var nl = await _context.NguyenLieu.FindAsync(model.idNL);
-            if (nl == null) return NotFound($"Không tìm thấy nguyên liệu {model.idNL}");
-
-            if (model.loaiPhieu == loaiPhieuKho.Nhap)
-                nl.soLuongTon += model.soLuong;
-            else if (model.loaiPhieu == loaiPhieuKho.Xuat)
-            {
-                if (nl.soLuongTon < model.soLuong)
-                    return BadRequest("Không đủ hàng trong kho để xuất!");
-                nl.soLuongTon -= model.soLuong;
-            }
-
-            await _context.PhieuKho.AddAsync(model);
-            await _context.SaveChangesAsync();
-
-            return Ok(new
-            {
-                message = $"Tạo phiếu {model.loaiPhieu} thành công và cập nhật tồn kho!",
-                data = model
-            });
-        }
+        // ==============================
+        // SINH MÃ PKxxx
+        // ==============================
         private async Task<string> GenerateNewPhieuId()
         {
-            // Lấy phiếu mới nhất theo ID (PKxxx)
-            var lastPhieu = await _context.PhieuKho
-                .OrderByDescending(p => p.idPhieu)
+            var last = await _context.PhieuKho
+                .OrderByDescending(x => x.idPhieu)
+                .Select(x => x.idPhieu)
                 .FirstOrDefaultAsync();
 
-            if (lastPhieu == null)
-                return "PK001";
+            if (last == null) return "PK001";
 
-            string? lastId = lastPhieu.idPhieu; // ví dụ PK015
-            int num = int.Parse(lastId.Substring(2)); // lấy số: 15
-            num++;
-
-            return "PK" + num.ToString("D3"); // thành PK016
+            int num = int.Parse(last.Substring(2));
+            return "PK" + (num + 1).ToString("D3");
         }
 
+
+        // ==============================
+        // NHẬP KHO (NHIỀU NGUYÊN LIỆU)
+        // ==============================
         [HttpPost("Nhap")]
         public async Task<IActionResult> NhapKho([FromBody] NhapKhoRequest request)
         {
-            if (request.items == null || !request.items.Any())
-                return BadRequest(new { message = "Danh sách nguyên liệu nhập không được rỗng" });
+            if (request == null || request.items == null || !request.items.Any())
+            {
+                return BadRequest(new { message = "Dữ liệu nhập kho không hợp lệ" });
+            }
 
             foreach (var item in request.items)
             {
+                // 1. Check nguyên liệu
                 var nl = await _context.NguyenLieu.FindAsync(item.idNL);
-                if (nl == null) continue;
+                if (nl == null)
+                {
+                    return NotFound(new { message = $"Không tìm thấy nguyên liệu {item.idNL}" });
+                }
 
-                var newId = await GenerateNewPhieuId();
+                // 2. Cập nhật tồn kho
+                nl.soLuongTon += item.soLuong;
 
+                // 3. Tạo phiếu nhập
                 var phieu = new PhieuKho
                 {
-                    idPhieu = newId,
+                    idPhieu = "PK" + DateTime.UtcNow.Ticks,
                     idNL = item.idNL,
                     idNCC = request.idNCC,
                     soLuong = item.soLuong,
                     ngay = DateTime.Now,
                     loaiPhieu = loaiPhieuKho.Nhap,
-                    ghiChu = request.ghiChu,
+                    ghiChu = request.ghiChu ?? ""
                 };
 
                 _context.PhieuKho.Add(phieu);
-
-                // Cập nhật kho
-                nl.soLuongTon += item.soLuong;
             }
 
             await _context.SaveChangesAsync();
@@ -124,35 +135,37 @@ namespace backend.Controllers
         }
 
 
+
+        // ==============================
+        // XUẤT KHO
+        // ==============================
         [HttpPost("Xuat")]
         public async Task<IActionResult> XuatKho([FromBody] XuatKhoRequest request)
         {
             var nl = await _context.NguyenLieu.FindAsync(request.idNL);
-            if (nl == null) return NotFound(new { message = "Không tìm thấy nguyên liệu" });
+            if (nl == null) return NotFound("Không tìm thấy nguyên liệu!");
 
             if (nl.soLuongTon < request.soLuong)
-                return BadRequest(new { message = "Không đủ tồn kho" });
+                return BadRequest("Không đủ tồn kho!");
+
+            var newId = await GenerateNewPhieuId();
 
             var phieu = new PhieuKho
             {
-                idPhieu = "PK" + DateTime.Now.Ticks,
+                idPhieu = newId,
                 idNL = request.idNL,
-                idNCC = null,
                 soLuong = request.soLuong,
                 ngay = DateTime.Now,
-                loaiPhieu = loaiPhieuKho.Xuat,    // BE tự set
-                ghiChu = request.ghiChu
+                loaiPhieu = loaiPhieuKho.Xuat,
+                ghiChu = request.ghiChu ?? "Xuất kho"
             };
 
             _context.PhieuKho.Add(phieu);
 
-            // Trừ kho
             nl.soLuongTon -= request.soLuong;
 
             await _context.SaveChangesAsync();
-            return Ok(new { message = "Xuất kho thành công" });
+            return Ok(new { message = "Xuất kho thành công!" });
         }
-
-
     }
 }

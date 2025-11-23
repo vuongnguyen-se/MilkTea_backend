@@ -14,5 +14,6 @@ namespace backend.Models
   {
     public string? idNL { get; set; }        // nguyên liệu
     public int soLuong { get; set; }        // số lượng nhập
+    public DateTime hanSuDung { get; set; }
   }
 }

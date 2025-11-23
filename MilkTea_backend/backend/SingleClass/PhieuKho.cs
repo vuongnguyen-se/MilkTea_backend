@@ -18,7 +18,7 @@ namespace backend.SingleClass
         public string? idNCC { get; set; }
 
         [Column("soLuong")]
-        public int soLuong { get; set; }
+        public float soLuong { get; set; }
 
         [Column("ngay")]
         public DateTime ngay { get; set; }

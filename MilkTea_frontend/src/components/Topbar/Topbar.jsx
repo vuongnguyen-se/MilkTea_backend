@@ -94,13 +94,13 @@ const Topbar = ({ activeTab }) => {
                 Quản lý tài khoản
               </Button>
 
-              <Button
+              {/* <Button
                 icon={<BarChartOutlined />}
                 className={activeTab === "report" ? "pm-nav-active" : ""}
                 onClick={() => navigate("/management/report")}
               >
                 Báo cáo
-              </Button>
+              </Button> */}
             </>
           )}
 

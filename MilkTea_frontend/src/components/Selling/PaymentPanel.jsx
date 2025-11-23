@@ -1,8 +1,7 @@
-// src/components/Selling/PaymentPanel.jsx
-import React, { useMemo, useState } from 'react';
-import { Card, Divider, Button, Tag } from 'antd';
-import { formatCurrency } from '../utils/formatCurrency.jsx';
-import '../../styles/Selling.css';
+import React, { useMemo, useState } from "react";
+import { Card, Divider, Button, Tag, message } from "antd";
+import { formatCurrency } from "../utils/formatCurrency.jsx";
+import "../../styles/Selling.css";
 import {
   CreditCardOutlined,
   MobileOutlined,
@@ -18,65 +17,72 @@ const PaymentPanel = ({
   const [customerPhone, setCustomerPhone] = useState("");
   const [promotionCode, setPromotionCode] = useState("");
 
-  // discount chỉ tính khi người dùng bấm ÁP DỤNG
-  const [appliedDiscount, setAppliedDiscount] = useState(0);
   const [appliedCode, setAppliedCode] = useState(null);
+  const [promoPercent, setPromoPercent] = useState(null);
 
   const safeItems = Array.isArray(items) ? items : [];
 
-  // Tạm tính
+  // ===== TẠM TÍNH =====
   const subtotal = useMemo(
-    () =>
-      safeItems.reduce(
-        (sum, item) => sum + item.price * item.quantity,
-        0,
-      ),
-    [safeItems],
+    () => safeItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    [safeItems]
   );
 
-  // ===== BẤM ÁP DỤNG =====
-  const applyPromo = () => {
+  // ===== ÁP DỤNG MÃ =====
+  const applyPromo = async () => {
     const code = promotionCode.trim().toUpperCase();
-    let discount = 0;
-
     if (!code) {
-      setAppliedDiscount(0);
       setAppliedCode(null);
+      setPromoPercent(null);
       return;
     }
 
-    // RULE TẠM THỜI
-    if (code === "GIANGSINH") discount = 3000;
-    else if (code === "NAMMOI2026") discount = 5000;
-    else if (code === "HAPPYHOUR") discount = subtotal * 0.1;
-    else discount = 0;
+    try {
+      const res = await fetch(
+        `http://localhost:5159/shopAPI/KhuyenMai/Check?code=${code}`
+      );
 
-    setAppliedDiscount(discount);
-    setAppliedCode(code);
+      if (!res.ok) {
+        message.error("Mã không hợp lệ hoặc đã hết hạn!");
+        setAppliedCode(null);
+        setPromoPercent(null);
+        return;
+      }
+
+      const json = await res.json();
+
+      setAppliedCode(code);
+      setPromoPercent(json.percent); // 0.30 = 30%
+      message.success("Đã áp dụng mã " + code);
+
+    } catch (err) {
+      message.error("Không thể kiểm tra mã giảm giá!");
+      setAppliedCode(null);
+      setPromoPercent(null);
+    }
   };
 
-  const total = Math.max(0, subtotal - appliedDiscount);
+  // ===== TÍNH GIẢM GIÁ & TỔNG =====
+  const discountAmount = promoPercent ? subtotal * promoPercent : 0;
+  const estimatedTotal = subtotal - discountAmount;
 
+  // ===== CHECKOUT =====
   const handleCheckout = () => {
     onCheckout({
-      subtotal,
-      discount: appliedDiscount,
-      total,
       customerPhone,
-      promotionCode: appliedCode, // mã đã xác nhận
+      promotionCode: appliedCode,
     });
   };
 
   return (
     <div className="sales-column sales-payment">
       <Card title="Thanh toán" bordered={false}>
-
         {/* KHÁCH HÀNG */}
         <div className="payment-section">
           <div className="payment-label">Khách hàng</div>
           <input
             className="payment-input"
-            placeholder="Nhập SĐT khách hàng (bỏ trống = khách lẻ)"
+            placeholder="Nhập SĐT (bỏ trống = khách lẻ)"
             value={customerPhone}
             onChange={(e) => setCustomerPhone(e.target.value)}
           />
@@ -85,16 +91,15 @@ const PaymentPanel = ({
         {/* MÃ KHUYẾN MÃI */}
         <div className="payment-section">
           <div className="payment-label">Mã khuyến mãi</div>
+
           <div className="promo-row">
             <input
               className="payment-input"
-              placeholder="Nhập mã khuyến mãi (VD: GIANGSINH)"
+              placeholder="VD: HAPPYHOUR"
               value={promotionCode}
               onChange={(e) => setPromotionCode(e.target.value)}
             />
-            <Button type="default" onClick={applyPromo}>
-              Áp dụng
-            </Button>
+            <Button onClick={applyPromo}>Áp dụng</Button>
           </div>
 
           <div className="promo-tags">
@@ -144,11 +149,13 @@ const PaymentPanel = ({
           <span>{formatCurrency(subtotal)}</span>
         </div>
 
-        {/* KHUYẾN MÃI ĐÃ ÁP DỤNG */}
-        {appliedDiscount > 0 && (
+        {/* KHUYẾN MÃI */}
+        {promoPercent !== null && (
           <div className="payment-summary-row" style={{ color: "green" }}>
-            <span>Khuyến mãi ({appliedCode})</span>
-            <span>- {formatCurrency(appliedDiscount)}</span>
+            <span>
+              Khuyến mãi ({appliedCode} – {promoPercent * 100}%)
+            </span>
+            <span>- {formatCurrency(discountAmount)}</span>
           </div>
         )}
 
@@ -156,9 +163,9 @@ const PaymentPanel = ({
 
         {/* TỔNG CỘNG */}
         <div className="payment-total-row">
-          <span className="payment-total-label">Tổng cộng</span>
+          <span className="payment-total-label">Tổng cộng (ước tính)</span>
           <span className="payment-total-value">
-            {formatCurrency(total)}
+            {formatCurrency(estimatedTotal)}
           </span>
         </div>
 
@@ -166,7 +173,6 @@ const PaymentPanel = ({
           type="primary"
           block
           size="large"
-          className="btn-checkout"
           onClick={handleCheckout}
           disabled={safeItems.length === 0}
         >
